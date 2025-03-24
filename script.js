@@ -2412,11 +2412,12 @@ function updateOverallProgress() {
 
 // Function to manually validate moves for puzzle 7
 function validatePuzzle7Move(from, to, moveIndex) {
+    console.log(`Validating puzzle 7 move (index ${moveIndex}): ${from}${to}`);
+
     // Get the correct moves from the customPuzzles array
     const puzzle7 = customPuzzles[6]; // Index 6 is the 7th puzzle
 
     // Debug logging
-    console.log(`Validating puzzle 7 move (index ${moveIndex}): ${from}${to}`);
     console.log(`Expected move: ${puzzle7.moves[moveIndex]}`);
 
     // Check if there's a move at this index
@@ -2436,7 +2437,7 @@ function validatePuzzle7Move(from, to, moveIndex) {
     const normalizedFrom = from.toLowerCase();
     let normalizedTo = to.toLowerCase();
 
-    // For promotion moves, normalize the format
+    // Special handling for the promotion move
     if (moveIndex === 2) { // The promotion move
         // If user enters f7e8=n or f7e8n or similar
         if (normalizedTo.includes('=')) {
@@ -2450,6 +2451,12 @@ function validatePuzzle7Move(from, to, moveIndex) {
         // For the promotion move, we need to be more flexible
         if (normalizedFrom === 'f7' && normalizedTo === 'e8') {
             console.log("Promotion move detected - Knight promotion is correct!");
+            // Update puzzle button color for correct move
+            const puzzleButton = document.querySelector(`.puzzle-btn:nth-child(7)`);
+            if (puzzleButton) {
+                puzzleButton.style.backgroundColor = '#4CAF50';
+                puzzleButton.style.color = 'white';
+            }
             return true;
         }
     }
@@ -2458,20 +2465,20 @@ function validatePuzzle7Move(from, to, moveIndex) {
     const normalizedExpectedFrom = expectedFrom.toLowerCase();
     const normalizedExpectedTo = expectedTo.toLowerCase();
 
-    // Check if this is a promotion move from the expected move
-    let isPromotion = false;
-    let expectedPromote = null;
-
-    if (expectedMove.length > 4) {
-        isPromotion = true;
-        expectedPromote = expectedMove.substring(4, 5).toLowerCase();
-        console.log(`Expected promotion piece: ${expectedPromote}`);
-    }
-
     // Check if the move matches the expected move
     const isCorrect = (normalizedFrom === normalizedExpectedFrom && normalizedTo === normalizedExpectedTo);
 
-    console.log(`Move validation result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
+    // Update puzzle button color based on the result
+    const puzzleButton = document.querySelector(`.puzzle-btn:nth-child(7)`);
+    if (puzzleButton) {
+        if (isCorrect) {
+            puzzleButton.style.backgroundColor = '#4CAF50';
+            puzzleButton.style.color = 'white';
+        } else {
+            puzzleButton.style.backgroundColor = '#FF6347';
+            puzzleButton.style.color = 'white';
+        }
+    }
 
     return isCorrect;
 }
@@ -2546,11 +2553,12 @@ function validatePuzzle8Move(from, to, moveIndex) {
 
 // Function to validate moves for puzzle 9
 function validatePuzzle9Move(from, to, moveIndex) {
+    console.log(`Validating puzzle 9 move (index ${moveIndex}): ${from}${to}`);
+
     // Get the correct moves from the customPuzzles array
     const puzzle9 = customPuzzles[8]; // Index 8 is the 9th puzzle
 
     // Debug logging
-    console.log(`Validating puzzle 9 move (index ${moveIndex}): ${from}${to}`);
     console.log(`Expected move: ${puzzle9.moves[moveIndex]}`);
 
     // Check if there's a move at this index
@@ -2569,47 +2577,35 @@ function validatePuzzle9Move(from, to, moveIndex) {
     // Normalize input to lowercase for flexible comparison
     const normalizedFrom = from.toLowerCase();
     const normalizedTo = to.toLowerCase();
-
-    // Check if this is a promotion move
-    let isPromotion = false;
-    let expectedPromote = null;
-    let actualPromote = null;
-
-    if (expectedMove.length > 4) {
-        isPromotion = true;
-        expectedPromote = expectedMove.substring(4, 5).toLowerCase();
-        console.log(`Expected promotion piece: ${expectedPromote}`);
-    }
-
-    // Check for promotion in the actual move
-    if (normalizedTo.length > 2) {
-        const parts = normalizedTo.split('=');
-        if (parts.length > 1) {
-            actualPromote = parts[1].toLowerCase();
-            console.log(`Actual promotion piece: ${actualPromote}`);
-        }
-    }
+    const normalizedExpectedFrom = expectedFrom.toLowerCase();
+    const normalizedExpectedTo = expectedTo.toLowerCase();
 
     // Check if the move matches the expected move
-    let isCorrect = (normalizedFrom === expectedFrom && normalizedTo === expectedTo);
+    const isCorrect = (normalizedFrom === normalizedExpectedFrom && normalizedTo === normalizedExpectedTo);
 
-    // If promotion is involved, check that too
-    if (isPromotion) {
-        isCorrect = isCorrect && (expectedPromote === actualPromote);
+    // Update puzzle button color based on the result
+    const puzzleButton = document.querySelector(`.puzzle-btn:nth-child(9)`);
+    if (puzzleButton) {
+        if (isCorrect) {
+            puzzleButton.style.backgroundColor = '#4CAF50';
+            puzzleButton.style.color = 'white';
+        } else {
+            puzzleButton.style.backgroundColor = '#FF6347';
+            puzzleButton.style.color = 'white';
+        }
     }
-
-    console.log(`Move validation result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
 
     return isCorrect;
 }
 
 // Function to validate moves for puzzle 10
 function validatePuzzle10Move(from, to, moveIndex) {
+    console.log(`Validating puzzle 10 move (index ${moveIndex}): ${from}${to}`);
+
     // Get the correct moves from the customPuzzles array
     const puzzle10 = customPuzzles[9]; // Index 9 is the 10th puzzle
 
     // Debug logging
-    console.log(`Validating puzzle 10 move (index ${moveIndex}): ${from}${to}`);
     console.log(`Expected move: ${puzzle10.moves[moveIndex]}`);
 
     // Check if there's a move at this index
@@ -2631,43 +2627,27 @@ function validatePuzzle10Move(from, to, moveIndex) {
     const normalizedExpectedFrom = expectedFrom.toLowerCase();
     const normalizedExpectedTo = expectedTo.toLowerCase();
 
-    // Check if this is a promotion move
-    let isPromotion = false;
-    let expectedPromote = null;
-    let actualPromote = null;
+    // Check if the move matches the expected move
+    const isCorrect = (normalizedFrom === normalizedExpectedFrom && normalizedTo === normalizedExpectedTo);
 
-    if (expectedMove.length > 4) {
-        isPromotion = true;
-        expectedPromote = expectedMove.substring(4, 5).toLowerCase();
-        console.log(`Expected promotion piece: ${expectedPromote}`);
-    }
-
-    // Check for promotion in the actual move
-    if (normalizedTo.length > 2) {
-        const parts = normalizedTo.split('=');
-        if (parts.length > 1) {
-            actualPromote = parts[1].toLowerCase();
-            console.log(`Actual promotion piece: ${actualPromote}`);
+    // Update puzzle button color based on the result
+    const puzzleButton = document.querySelector(`.puzzle-btn:nth-child(10)`);
+    if (puzzleButton) {
+        if (isCorrect) {
+            puzzleButton.style.backgroundColor = '#4CAF50';
+            puzzleButton.style.color = 'white';
+        } else {
+            puzzleButton.style.backgroundColor = '#FF6347';
+            puzzleButton.style.color = 'white';
         }
     }
-
-    // Check if the move matches the expected move
-    let isCorrect = (normalizedFrom === normalizedExpectedFrom && normalizedTo === normalizedExpectedTo);
-
-    // If promotion is involved, check that too
-    if (isPromotion) {
-        isCorrect = isCorrect && (expectedPromote === actualPromote);
-    }
-
-    console.log(`Move validation result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
 
     return isCorrect;
 }
 
 // Add a dedicated function to set up puzzle 7 properly
 function setupPuzzle7() {
-    console.log("Setting up puzzle 7 - Knight Dance to Checkmate");
-
+    console.log("Setting up puzzle 7 - Queen Sacrifice to Knight Promotion Mate");
     try {
         // Set the indices correctly
         puzzleIndex = 6; // Adjust this to 6 (0-based index for puzzle 7)
@@ -2701,7 +2681,8 @@ function setupPuzzle7() {
         console.log("Loading board for puzzle 7");
         loadBoard(currentFEN);
 
-        updateMessage('<p>Puzzle 7: Knight Dance to Checkmate</p><p>White to play: Find the forced mate sequence</p>', '');
+        // Update message with puzzle info
+        updateMessage('<p>Puzzle 7: Queen Sacrifice to Knight Promotion Mate</p><p>White to play: Find the winning sequence with queen sacrifice and knight promotion</p>', '');
 
         // Make sure board is oriented correctly
         flipBoard(false);
@@ -2712,11 +2693,14 @@ function setupPuzzle7() {
         // Ensure the board is interactive
         ensureBoardIsInteractive();
 
+        // Update game info and debug
+        updateGameInfo();
+        updateDebug();
+
         console.log("Puzzle 7 setup complete");
     } catch (error) {
         console.error("Error setting up puzzle 7:", error);
-
-        // Try a basic recovery
+        // Try basic recovery
         try {
             console.log("Attempting basic recovery for puzzle 7");
             clearAllPieces();
@@ -2725,9 +2709,8 @@ function setupPuzzle7() {
             currentStatus = game.exportJson();
             currentFEN = fallbackFen;
             currentPuzzle = JSON.parse(JSON.stringify(customPuzzles[6]));
-
             loadBoard(currentFEN);
-            updateMessage('<p>Puzzle 7: Knight Dance to Checkmate</p><p>White to play: Find the forced mate sequence</p>', '');
+            updateMessage('<p>Puzzle 7: Queen Sacrifice to Knight Promotion Mate</p><p>White to play: Find the winning sequence with queen sacrifice and knight promotion</p>', '');
             flipBoard(false);
             currentPuzzleIndex = 7;
             highlightCurrentPuzzleButton(7);
