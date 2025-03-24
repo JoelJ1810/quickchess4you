@@ -1,0 +1,1548 @@
+:root {
+    --square: min(64px, calc((100vw - 30px) / 8));
+    --light: #f4e8c1;
+    --dark: #c5a377;
+    --background: #efebe0;
+    --selected: rgba(20, 85, 30, .5);
+    --selected-text: white;
+    --previous: rgba(155, 199, 0, .41);
+    --corner-radius: 10px;
+    --message-neutral: rgb(104, 104, 102);
+    --message-neutral-text: white;
+    --message-good: #629924;
+    --message-good-text: white;
+    --message-bad: #c33;
+    --message-bad-text: white;
+    --main-text: #A48044;
+}
+
+@media screen and (min-width: 768px) {
+     :root {
+        --square: min(64px, calc((100vw - 60px) / 8));
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 110%;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--background);
+    height: 100%;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 120px 10px 20px 10px;
+    background-color: var(--background);
+    color: var(--main-text);
+    overflow-x: hidden;
+}
+
+
+/* Header Logo Styles */
+
+.header-logo {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 220px;
+    height: auto;
+    z-index: 1000;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+@media screen and (max-width: 768px) {
+    .header-logo {
+        width: 160px;
+        top: 10px;
+        left: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .header-logo {
+        width: 140px;
+        top: 5px;
+        left: 5px;
+    }
+}
+
+
+/* Container Layout */
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+    padding-top: 20px;
+    padding-left: 0;
+    margin-bottom: 60px;
+}
+
+@media screen and (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 15px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: auto auto;
+        padding-left: 0;
+        gap: 10px;
+    }
+    .timer-section {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    main#board {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+    }
+    .puzzle-section {
+        grid-column: 1;
+        grid-row: 2;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        padding-left: 0;
+        padding-top: 0;
+    }
+    .timer-section {
+        grid-column: 1;
+        grid-row: 1;
+        position: relative;
+        margin: 0 auto 10px;
+        padding: 10px;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 300px;
+    }
+    main#board {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0 auto;
+    }
+    .puzzle-section {
+        grid-column: 1;
+        grid-row: 3;
+        margin: 10px auto 0;
+        width: 100%;
+        max-width: 220px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .timer-section .timer-display {
+        font-size: 5rem;
+    }
+    .timer-section .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding-top: 60px;
+    }
+    body {
+        padding: 80px 5px 10px 5px;
+    }
+    .timer-section {
+        margin-top: 0;
+    }
+    .timer-section .timer-display {
+        font-size: 4rem;
+        letter-spacing: 2px;
+    }
+    .timer-section .section-title {
+        font-size: 1.6rem;
+    }
+    main div.P span,
+    main div.p span,
+    main div.R span,
+    main div.r span,
+    main div.N span,
+    main div.n span,
+    main div.B span,
+    main div.b span,
+    main div.Q span,
+    main div.q span,
+    main div.K span,
+    main div.k span {
+        background-size: 75%;
+    }
+    main div.circle.P span,
+    main div.circle.p span,
+    main div.circle.R span,
+    main div.circle.r span,
+    main div.circle.N span,
+    main div.circle.n span,
+    main div.circle.B span,
+    main div.circle.b span,
+    main div.circle.Q span,
+    main div.circle.q span,
+    main div.circle.K span,
+    main div.circle.k span {
+        box-shadow: 0 0 0 calc(var(--square) * 0.3) var(--selected);
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .container {
+        padding-top: 50px;
+    }
+    .timer-display {
+        font-size: 2.5rem;
+    }
+    .section-title {
+        font-size: 1.2rem;
+    }
+}
+
+
+/* Logo Section */
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    filter: brightness(0) saturate(100%) invert(69%) sepia(19%) saturate(638%) hue-rotate(9deg) brightness(91%) contrast(86%);
+}
+
+.logo-section h1 {
+    font-size: 2.5rem;
+    margin-top: 10px;
+    line-height: 1;
+    color: var(--main-text);
+    font-weight: bold;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1.8rem;
+}
+
+
+/* Timer Section */
+
+.timer-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 20px;
+    background-color: var(--background);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    z-index: 999;
+    margin-top: 100px;
+}
+
+.timer-section .section-title {
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #c5a377;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-family: 'Gagalin', 'Arial', sans-serif;
+    letter-spacing: 1px;
+}
+
+.timer-section .timer-display {
+    font-size: 7.5rem;
+    font-weight: normal;
+    color: #c5a377;
+    text-align: center;
+    letter-spacing: 6px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    font-family: 'Gagalin', 'Arial', sans-serif;
+    padding: 0;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    line-height: 0.9;
+}
+
+@media screen and (max-width: 768px) {
+    .timer-section .timer-display {
+        font-size: 4.5rem;
+        letter-spacing: 3px;
+    }
+    .timer-section .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .timer-section .timer-display {
+        font-size: 3.5rem;
+        letter-spacing: 2px;
+    }
+    .timer-section .section-title {
+        font-size: 1.6rem;
+    }
+    .puzzle-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .timer-section .timer-display {
+        font-size: 3rem;
+    }
+    .timer-section .section-title {
+        font-size: 1.4rem;
+    }
+}
+
+
+/* Timer warning states */
+
+.timer-display.warning {
+    color: #FFA500;
+    animation: pulse 1s infinite;
+}
+
+.timer-display.critical {
+    color: #FF0000;
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* Puzzle Section */
+
+.puzzle-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    width: 100%;
+    max-width: 220px;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--main-text);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.puzzle-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 8px;
+    width: 100%;
+}
+
+.puzzle-btn {
+    background-color: #c5a377;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0;
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: auto;
+    min-height: 40px;
+}
+
+.nav-buttons {
+    grid-column: 1 / span 3;
+    grid-row: 5;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+
+/* Create the layout with button 1 alone at top */
+
+.puzzle-btn:nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 4px;
+}
+
+
+/* Second row - buttons 2,3,4 */
+
+.puzzle-btn:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.puzzle-btn:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.puzzle-btn:nth-child(4) {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+
+/* Third row - buttons 5,6,7 */
+
+.puzzle-btn:nth-child(5) {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.puzzle-btn:nth-child(6) {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.puzzle-btn:nth-child(7) {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+
+/* Fourth row - buttons 8,9,10 */
+
+.puzzle-btn:nth-child(8) {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+.puzzle-btn:nth-child(9) {
+    grid-column: 2;
+    grid-row: 4;
+}
+
+.puzzle-btn:nth-child(10) {
+    grid-column: 3;
+    grid-row: 4;
+}
+
+.nav-btn {
+    background-color: #c5a377;
+    border: none;
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    filter: blur(2px);
+    z-index: -1;
+}
+
+.prev-btn,
+.next-btn,
+.play-btn,
+.pause-btn {
+    background: linear-gradient(135deg, #d6bb99, #c5a377);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), transparent);
+    border-radius: 50% 50% 0 0;
+    pointer-events: none;
+}
+
+.nav-btn svg {
+    width: 26px;
+    height: 26px;
+    transform: scale(1.2);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.nav-btn svg polygon,
+.nav-btn svg rect {
+    fill: white;
+    stroke: white;
+    stroke-width: 0.75;
+}
+
+.prev-btn svg {
+    margin-right: 2px;
+    transform: translateX(-1px) scale(1.2);
+}
+
+.next-btn svg {
+    margin-left: 2px;
+    transform: translateX(1px) scale(1.2);
+}
+
+.puzzle-btn:hover {
+    background-color: #d6bb99;
+    transform: scale(1.05);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, #d8c1a5, #c5a377);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.6);
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-btn.active {
+    background-color: #A48044;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(164, 128, 68, 0.5);
+}
+
+
+/* Main Board */
+
+main {
+    background-color: var(--light);
+    color: var(--dark);
+    display: flex;
+    flex-flow: column-reverse wrap;
+    height: calc(var(--square) * 8);
+    width: calc(var(--square) * 8);
+    border-radius: var(--corner-radius);
+    margin: 0 auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media screen and (max-width: 480px) {
+    main {
+        height: calc(var(--square) * 8);
+        width: calc(var(--square) * 8);
+    }
+}
+
+main.flip {
+    flex-flow: column wrap-reverse;
+}
+
+main div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--square);
+    min-height: var(--square);
+    overflow: hidden;
+}
+
+main div.previous {
+    color: var(--previous-text) !important;
+}
+
+main div.previous span {
+    background-color: var(--previous);
+    width: 100%;
+    height: 100%;
+}
+
+main div.circle span {
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background-color: var(--selected);
+}
+
+main div.circle.P span,
+main div.circle.p span,
+main div.circle.R span,
+main div.circle.r span,
+main div.circle.N span,
+main div.circle.n span,
+main div.circle.B span,
+main div.circle.b span,
+main div.circle.Q span,
+main div.circle.q span,
+main div.circle.K span,
+main div.circle.k span {
+    width: 100%;
+    height: 100%;
+    background-color: transparent !important;
+    border-radius: 35%;
+    box-shadow: 0 0 0 calc(var(--square) * 0.3) var(--selected);
+}
+
+main div.circle:hover span {
+    width: 100%;
+    height: 100%;
+    border-radius: 0%;
+    background-color: var(--selected) !important;
+    cursor: pointer;
+}
+
+main div.selected {
+    color: var(--selected-text) !important;
+}
+
+main div.selected span {
+    background-color: var(--selected) !important;
+}
+
+main div.P:hover,
+main div.R:hover,
+main div.N:hover,
+main div.B:hover,
+main div.Q:hover,
+main div.K:hover {
+    cursor: pointer;
+}
+
+main.flip div.p:hover,
+main.flip div.r:hover,
+main.flip div.n:hover,
+main.flip div.b:hover,
+main.flip div.q:hover,
+main.flip div.k:hover {
+    cursor: pointer;
+}
+
+
+/* Board & Squares */
+
+#a1,
+#c1,
+#e1,
+#g1,
+#b2,
+#d2,
+#f2,
+#h2,
+#a3,
+#c3,
+#e3,
+#g3,
+#b4,
+#d4,
+#f4,
+#h4,
+#a5,
+#c5,
+#e5,
+#g5,
+#b6,
+#d6,
+#f6,
+#h6,
+#a7,
+#c7,
+#e7,
+#g7,
+#b8,
+#d8,
+#f8,
+#h8 {
+    background-color: var(--dark);
+}
+
+
+/* Pieces */
+
+main div span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+main div.P span {
+    background: url('./media/chess_pawn_light.svg') center/80% no-repeat;
+}
+
+main div.p span {
+    background: url('./media/chess_pawn_dark.svg') center/80% no-repeat;
+}
+
+main div.R span {
+    background: url('./media/chess_rook_light.svg') center/80% no-repeat;
+}
+
+main div.r span {
+    background: url('./media/chess_rook_dark.svg') center/80% no-repeat;
+}
+
+main div.N span {
+    background: url('./media/chess_knight_light.svg') center/80% no-repeat;
+}
+
+main div.n span {
+    background: url('./media/chess_knight_dark.svg') center/80% no-repeat;
+}
+
+main div.B span {
+    background: url('./media/chess_bishop_light.svg') center/80% no-repeat;
+}
+
+main div.b span {
+    background: url('./media/chess_bishop_dark.svg') center/80% no-repeat;
+}
+
+main div.Q span {
+    background: url('./media/chess_queen_light.svg') center/80% no-repeat;
+}
+
+main div.q span {
+    background: url('./media/chess_queen_dark.svg') center/80% no-repeat;
+}
+
+main div.K span {
+    background: url('./media/chess_king_light.svg') center/80% no-repeat;
+}
+
+main div.k span {
+    background: url('./media/chess_king_dark.svg') center/80% no-repeat;
+}
+
+
+/* Pieces scaling for responsive design */
+
+main div.P span,
+main div.p span,
+main div.R span,
+main div.r span,
+main div.N span,
+main div.n span,
+main div.B span,
+main div.b span,
+main div.Q span,
+main div.q span,
+main div.K span,
+main div.k span {
+    background-size: 80%;
+}
+
+@media screen and (max-width: 480px) {
+    main div.P span,
+    main div.p span,
+    main div.R span,
+    main div.r span,
+    main div.N span,
+    main div.n span,
+    main div.B span,
+    main div.b span,
+    main div.Q span,
+    main div.q span,
+    main div.K span,
+    main div.k span {
+        background-size: 75%;
+    }
+}
+
+
+/* Footer */
+
+footer {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: var(--corner-radius);
+    width: 100%;
+    max-width: 600px;
+}
+
+#message {
+    margin: 1em auto 0.5em auto;
+    padding: 0.5em;
+    border-radius: var(--corner-radius);
+    background-color: var(--message-neutral);
+    color: var(--message-neutral-text);
+    width: fit-content;
+    min-width: 16em;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    display: none !important;
+}
+
+@media screen and (max-width: 480px) {
+    #message {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+    #message p {
+        margin: 0;
+        line-height: 1.3;
+    }
+}
+
+#message #no-js {
+    display: block;
+}
+
+#message.good {
+    background-color: var(--message-good);
+    color: var(--message-good-text);
+    border-color: var(--message-good-text);
+}
+
+#message.bad {
+    background-color: var(--message-bad);
+    color: var(--message-bad-text);
+    border-color: var(--message-bad-text);
+}
+
+#message a {
+    color: inherit;
+}
+
+#message p {
+    margin: 0;
+    padding: 0;
+    font-size: 1.1rem;
+}
+
+#message p:nth-child(1) {
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+#message p:nth-child(2) {
+    margin-top: 0.5em;
+    font-size: 1rem;
+}
+
+
+/* Congrats Message */
+
+#congrats-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #E5D0AC;
+    border: 3px solid #FF9D23;
+    border-radius: var(--corner-radius);
+    padding: 20px 40px;
+    text-align: center;
+    z-index: 9999;
+    animation: fadeInOut 3s ease-in-out forwards;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    max-width: 90vw;
+}
+
+#congrats-message h2 {
+    color: var(--message-good);
+    margin-bottom: 10px;
+}
+
+#congrats-message p {
+    color: #333;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+
+/* Header */
+
+header {
+    /* padding: calc(var(--square) / 4) 0; */
+    width: 100%;
+    border-bottom: 1px solid #c5a377;
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    align-items: center;
+    background-color: #e5dccf;
+    position: relative;
+    /* Ensure relative positioning */
+    z-index: 900;
+    /* Lower z-index than the logo */
+}
+
+@media screen and (max-width: 400px) {
+    header {
+        grid-template-columns: 48px 1fr;
+    }
+    header h1 {
+        font-size: 1.75em;
+    }
+}
+
+header h1 {
+    color: #333;
+}
+
+
+/* Buttons */
+
+#menu-button svg,
+.close-button svg {
+    width: 100%;
+    height: 100%;
+    fill: #FF9D23;
+    margin-bottom: -0.6em;
+}
+
+#menu-button span,
+.close-button span {
+    font-size: 0.8em;
+    color: #FF9D23;
+}
+
+#menu-button,
+.close-button {
+    padding: 0.5em;
+    width: 48px;
+    border: none;
+    border-radius: var(--corner-radius);
+    background-color: #E5D0AC;
+}
+
+.close-button {
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.close-button svg {
+    fill: #FF9D23;
+}
+
+.close-button span {
+    color: #FF9D23;
+}
+
+#menu-button:hover,
+.close-button:hover {
+    cursor: pointer;
+}
+
+main#board div {
+    position: relative;
+}
+
+@media screen and (max-width: calc(64px * 8)) {
+    main#board div {
+        border-radius: 0;
+    }
+    main#board.flip div {
+        border-radius: 0;
+    }
+    main#board {
+        border-radius: var(--corner-radius);
+        overflow: hidden;
+    }
+}
+
+
+/* Board Labels */
+
+main div:before,
+main div:after {
+    content: "";
+    position: absolute;
+    font-size: 0.6em;
+    padding: 0.5em;
+}
+
+main div:before {
+    top: 0;
+    left: 0;
+}
+
+main:not(.flip) #a1:before {
+    content: "1";
+}
+
+main:not(.flip) #a2:before {
+    content: "2";
+}
+
+main:not(.flip) #a3:before {
+    content: "3";
+}
+
+main:not(.flip) #a4:before {
+    content: "4";
+}
+
+main:not(.flip) #a5:before {
+    content: "5";
+}
+
+main:not(.flip) #a6:before {
+    content: "6";
+}
+
+main:not(.flip) #a7:before {
+    content: "7";
+}
+
+main:not(.flip) #a8:before {
+    content: "8";
+}
+
+main.flip #h1:before {
+    content: "1";
+}
+
+main.flip #h2:before {
+    content: "2";
+}
+
+main.flip #h3:before {
+    content: "3";
+}
+
+main.flip #h4:before {
+    content: "4";
+}
+
+main.flip #h5:before {
+    content: "5";
+}
+
+main.flip #h6:before {
+    content: "6";
+}
+
+main.flip #h7:before {
+    content: "7";
+}
+
+main.flip #h8:before {
+    content: "8";
+}
+
+main div:after {
+    bottom: 0;
+    right: 0;
+}
+
+main:not(.flip) #a1:after {
+    content: "a";
+}
+
+main:not(.flip) #b1:after {
+    content: "b";
+}
+
+main:not(.flip) #c1:after {
+    content: "c";
+}
+
+main:not(.flip) #d1:after {
+    content: "d";
+}
+
+main:not(.flip) #e1:after {
+    content: "e";
+}
+
+main:not(.flip) #f1:after {
+    content: "f";
+}
+
+main:not(.flip) #g1:after {
+    content: "g";
+}
+
+main:not(.flip) #h1:after {
+    content: "h";
+}
+
+main.flip #a8:after {
+    content: "a";
+}
+
+main.flip #b8:after {
+    content: "b";
+}
+
+main.flip #c8:after {
+    content: "c";
+}
+
+main.flip #d8:after {
+    content: "d";
+}
+
+main.flip #e8:after {
+    content: "e";
+}
+
+main.flip #f8:after {
+    content: "f";
+}
+
+main.flip #g8:after {
+    content: "g";
+}
+
+main.flip #h8:after {
+    content: "h";
+}
+
+.clickable:hover {
+    cursor: pointer;
+}
+
+aside#debug {
+    position: absolute;
+    top: 70px;
+    padding: 0.5em;
+    font-size: 0.6em;
+    text-align: left;
+}
+
+
+/* Modal */
+
+div#info-modal {
+    backdrop-filter: blur(5px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    z-index: 9001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+}
+
+div#info-modal div,
+div#info-modal div {
+    background-color: #E5D0AC;
+    border-radius: var(--corner-radius);
+    border: 2px solid #FF9D23;
+    padding: 1.25em 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: calc(var(--square) * 7);
+    color: #333;
+}
+
+div#info-modal p.attribution {
+    font-size: 0.8em;
+    line-height: 1.5em;
+}
+
+div#info-modal h1,
+div#info-modal h2,
+div#info-modal h3 {
+    color: #333;
+    margin-bottom: 0.5em;
+}
+
+div#info-modal p {
+    margin-bottom: 1em;
+}
+
+div#info-modal a {
+    color: #FF9D23;
+    font-weight: bold;
+}
+
+.title-icon {
+    vertical-align: middle;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+#chess-facts {
+    margin: 5px 0 15px 0;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-left: 4px solid #FF9D23;
+    border-radius: 4px;
+    clear: both;
+    display: block;
+}
+
+h3+#chess-facts {
+    margin-top: 5px;
+}
+
+#chess-facts h3 {
+    display: none;
+}
+
+.chess-fact {
+    font-style: italic;
+    line-height: 1.4;
+    margin: 5px 0 15px 0;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-left: 4px solid #FF9D23;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#timeout-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: var(--corner-radius);
+    z-index: 1000;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s forwards;
+    max-width: 90vw;
+    width: 300px;
+}
+
+@media screen and (max-width: 480px) {
+    #timeout-message {
+        padding: 20px;
+    }
+    #timeout-message h2 {
+        font-size: 1.5rem;
+    }
+    #timeout-message p {
+        font-size: 1rem;
+    }
+    #restart-btn {
+        padding: 8px 16px;
+        font-size: 1rem;
+    }
+}
+
+.timer {
+    display: block;
+    margin: 10px auto;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 10px;
+    text-align: center;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Style for the custom puzzles button */
+
+#custom-puzzles-button {
+    display: block;
+    margin: 10px auto;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#custom-puzzles-button:hover {
+    background-color: #45a049;
+}
+
+#custom-puzzles-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+
+/* Board corners */
+
+#a8 {
+    border-radius: var(--corner-radius) 0 0 0;
+}
+
+#h8 {
+    border-radius: 0 var(--corner-radius) 0 0;
+}
+
+#h1 {
+    border-radius: 0 0 var(--corner-radius) 0;
+}
+
+#a1 {
+    border-radius: 0 0 0 var(--corner-radius);
+}
+
+
+/* Game over state */
+
+#board.game-over {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+
+/* Bottom arch styling */
+
+.bottom-arch {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background-color: #e3c498;
+    border-radius: 100% 100% 0 0;
+    z-index: -1;
+}
+
+@media screen and (max-width: 768px) {
+    .bottom-arch {
+        height: 60px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .bottom-arch {
+        height: 40px;
+    }
+}
+
+
+/* Make sure timer and caption text is responsive */
+
+.timer-display {
+    font-family: 'Gagalin', sans-serif;
+    text-align: center;
+    background-color: #D5B686;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 4.5rem;
+    color: white;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+    line-height: 1;
+    min-width: 180px;
+}
+
+@media screen and (max-width: 768px) {
+    .timer-display {
+        font-size: 3.5rem;
+        padding: 8px 15px;
+        min-width: 150px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .timer-display {
+        font-size: 2.8rem;
+        padding: 6px 12px;
+        min-width: 120px;
+    }
+}
+
+
+/* Ensure container has proper spacing */
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding-top: 60px;
+        gap: 15px;
+    }
+}
+
+
+/* Fix navigation buttons spacing */
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    grid-column: 1 / -1;
+    gap: 15px;
+}
+
+@media screen and (max-width: 480px) {
+    .nav-buttons {
+        gap: 10px;
+    }
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* Fix footer message for mobile */
+
+footer {
+    width: 100%;
+    margin-top: 20px;
+}
+
+@media screen and (max-width: 480px) {
+    footer {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+}
+
+
+/* Ensure the board div highlighting works at all screen sizes */
+
+main div.selected span,
+main div.circle:hover span {
+    transition: all 0.2s ease-in-out;
+}
+
+@media (hover: hover) {
+    main div.P:hover,
+    main div.R:hover,
+    main div.N:hover,
+    main div.B:hover,
+    main div.Q:hover,
+    main div.K:hover,
+    main.flip div.p:hover,
+    main.flip div.r:hover,
+    main.flip div.n:hover,
+    main.flip div.b:hover,
+    main.flip div.q:hover,
+    main.flip div.k:hover {
+        cursor: pointer;
+        box-shadow: inset 0 0 0 3px rgba(20, 85, 30, 0.3);
+    }
+}
+
+
+/* Touch-friendly styles for mobile */
+
+@media (pointer: coarse) {
+    .puzzle-btn,
+    .nav-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    main div.circle span {
+        width: 50%;
+        height: 50%;
+    }
+    main div.P span,
+    main div.p span,
+    main div.R span,
+    main div.r span,
+    main div.N span,
+    main div.n span,
+    main div.B span,
+    main div.b span,
+    main div.Q span,
+    main div.q span,
+    main div.K span,
+    main div.k span {
+        -webkit-tap-highlight-color: transparent;
+    }
+    /* Prevent zoom on double tap */
+    * {
+        touch-action: manipulation;
+    }
+}
+
+
+/* Fix for iOS Safari bottom bar */
+
+@supports (-webkit-touch-callout: none) {
+    body {
+        padding-bottom: 30px;
+    }
+    .bottom-arch {
+        bottom: env(safe-area-inset-bottom, 0);
+    }
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./media/chess_knight_dark.svg" type="image/svg+xml">
+    <link href="https://fonts.cdnfonts.com/css/gagalin" rel="stylesheet">
+    <script>
+        // Hide the error message as soon as possible
+        window.onload = function() {
+            document.getElementById('no-js').style.display = 'none';
+
+            // Hide any progress bars
+            const progressBars = document.querySelectorAll('div[style*="background-color: #4CAF50"], #timer-progress');
+            progressBars.forEach(bar => {
+                bar.style.display = 'none';
+            });
+
+            // Hide progress bar containers
+            const progressContainers = document.querySelectorAll('div[style*="background-color: #e0e0e0"], div[style*="overflow: hidden"]');
+            progressContainers.forEach(container => {
+                container.style.display = 'none';
+            });
+
+            // Check if logo loaded properly
+            const logoImg = document.getElementById('main-logo');
+            if (logoImg) {
+                logoImg.onerror = function() {
+                    console.log('Logo PNG failed to load, trying SVG...');
+                    this.src = './media/quick_chess_logo.svg';
+
+                    // If SVG also fails
+                    this.onerror = function() {
+                        console.log('Logo SVG also failed to load');
+                        this.style.display = 'none';
+                    };
+                };
+            }
+        }
+    </script>
+    <style>
+        /* Hide progress bars */
+        
+        div[style*="background-color: #4CAF50"],
+        #timer-progress,
+        div[style*="background-color: #e0e0e0"],
+        div.progress,
+        div.progress-bar {
+            display: none !important;
+        }
+        /* Bottom arch */
+        
+        .bottom-arch {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #e3c498;
+            border-radius: 100% 100% 0 0;
+            z-index: 0;
+        }
+        /* Improve puzzle button styles */
+        
+        .puzzle-btn {
+            transition: all 0.3s ease;
+        }
+        /* Green success button */
+        
+        .puzzle-btn[style*="background-color: #4CAF50"] {
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+            transform: scale(1.05);
+        }
+        /* Red failure button */
+        
+        .puzzle-btn[style*="background-color: #FF6347"] {
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+            transform: scale(1.05);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // Fallback for confetti if CDN fails
+        if (typeof confetti === 'undefined') {
+            window.confetti = function(options) {
+                console.log("Confetti fallback called with options:", options);
+                // Basic fallback implementation
+                return {
+                    particleCount: options.particleCount || 50,
+                    spread: options.spread || 70,
+                    origin: options.origin || {
+                        y: 0.6,
+                        x: 0.5
+                    }
+                };
+            };
+        }
+    </script>
+    <script src="./script.js" type="module"></script>
+    <title>Quick Chess 4 You</title>
+</head>
+
+<body>
+    <!-- Bottom arch element -->
+    <div class="bottom-arch"></div>
+
+    <!-- Header Logo -->
+    <img src="./media/quick_chess_logo.png" alt="Quick Chess 4 You Logo" class="header-logo" id="main-logo">
+
+    <div class="container">
+        <!-- Left Side - Timer -->
+        <div class="timer-section">
+            <h2 class="section-title">TIME LEFT</h2>
+            <div class="timer-display">10:00</div>
+        </div>
+
+        <!-- Chess Board -->
+        <main id="board">
+            <div id="a1" class="R"><span></span></div>
+            <div id="a2" class="P"><span></span></div>
+            <div id="a3"><span></span></div>
+            <div id="a4"><span></span></div>
+            <div id="a5"><span></span></div>
+            <div id="a6"><span></span></div>
+            <div id="a7" class="p"><span></span></div>
+            <div id="a8" class="r"><span></span></div>
+
+            <div id="b1" class="N"><span></span></div>
+            <div id="b2" class="P"><span></span></div>
+            <div id="b3"><span></span></div>
+            <div id="b4"><span></span></div>
+            <div id="b5"><span></span></div>
+            <div id="b6"><span></span></div>
+            <div id="b7" class="p"><span></span></div>
+            <div id="b8" class="n"><span></span></div>
+
+            <div id="c1" class="B"><span></span></div>
+            <div id="c2" class="P"><span></span></div>
+            <div id="c3"><span></span></div>
+            <div id="c4"><span></span></div>
+            <div id="c5"><span></span></div>
+            <div id="c6"><span></span></div>
+            <div id="c7" class="p"><span></span></div>
+            <div id="c8" class="b"><span></span></div>
+
+            <div id="d1" class="Q"><span></span></div>
+            <div id="d2" class="P"><span></span></div>
+            <div id="d3"><span></span></div>
+            <div id="d4"><span></span></div>
+            <div id="d5"><span></span></div>
+            <div id="d6"><span></span></div>
+            <div id="d7" class="p"><span></span></div>
+            <div id="d8" class="q"><span></span></div>
+
+            <div id="e1" class="K"><span></span></div>
+            <div id="e2" class="P"><span></span></div>
+            <div id="e3"><span></span></div>
+            <div id="e4"><span></span></div>
+            <div id="e5"><span></span></div>
+            <div id="e6"><span></span></div>
+            <div id="e7" class="p"><span></span></div>
+            <div id="e8" class="k"><span></span></div>
+
+            <div id="f1" class="B"><span></span></div>
+            <div id="f2" class="P"><span></span></div>
+            <div id="f3"><span></span></div>
+            <div id="f4"><span></span></div>
+            <div id="f5"><span></span></div>
+            <div id="f6"><span></span></div>
+            <div id="f7" class="p"><span></span></div>
+            <div id="f8" class="b"><span></span></div>
+
+            <div id="g1" class="N"><span></span></div>
+            <div id="g2" class="P"><span></span></div>
+            <div id="g3"><span></span></div>
+            <div id="g4"><span></span></div>
+            <div id="g5"><span></span></div>
+            <div id="g6"><span></span></div>
+            <div id="g7" class="p"><span></span></div>
+            <div id="g8" class="n"><span></span></div>
+
+            <div id="h1" class="R"><span></span></div>
+            <div id="h2" class="P"><span></span></div>
+            <div id="h3"><span></span></div>
+            <div id="h4"><span></span></div>
+            <div id="h5"><span></span></div>
+            <div id="h6"><span></span></div>
+            <div id="h7" class="p"><span></span></div>
+            <div id="h8" class="r"><span></span></div>
+        </main>
+
+        <!-- Right Side - Puzzle Selection -->
+        <div class="puzzle-section">
+            <h2 class="section-title">PUZZLES</h2>
+            <div class="puzzle-buttons">
+                <button class="puzzle-btn">1</button>
+                <button class="puzzle-btn">2</button>
+                <button class="puzzle-btn">3</button>
+                <button class="puzzle-btn">4</button>
+                <button class="puzzle-btn">5</button>
+                <button class="puzzle-btn">6</button>
+                <button class="puzzle-btn">7</button>
+                <button class="puzzle-btn">8</button>
+                <button class="puzzle-btn">9</button>
+                <button class="puzzle-btn">10</button>
+                <div class="nav-buttons">
+                    <button class="nav-btn prev-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26">
+                            <polygon points="15,6 8,12 15,18" fill="white"/>
+                        </svg>
+                    </button>
+                    <button class="nav-btn next-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26">
+                            <polygon points="9,6 16,12 9,18" fill="white"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="message">
+        <p id="no-js" style="display: none;">
+            <strong>Oh no!</strong> Either JavaScript is <a href="https://duckduckgo.com/?q=how+to+enable+javascript" target="_blank">disabled</a>, you have <br>a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors" target="_blank">CORS
+                error</a>, or you aren't running a <a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/set_up_a_local_testing_server" target="_blank">local server</a>.
+        </p>
+        <noscript>
+            <p>
+                <strong>Oh no!</strong> JavaScript is disabled. Please <a href="https://duckduckgo.com/?q=how+to+enable+javascript" target="_blank">enable JavaScript</a> to use this application.
+            </p>
+        </noscript>
+    </footer>
+
+    <div id="congrats-message" style="display:none;">
+        <h2>Congratulations!</h2>
+        <p>You solved the puzzle correctly!</p>
+    </div>
+
+    <aside id="debug" style="display: none;"></aside>
+</body>
+
+</html>
