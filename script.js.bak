@@ -1,0 +1,1643 @@
+// Add this standalone confetti function to the very top of the file
+// Standalone confetti function as a fallback
+if (typeof confetti === 'undefined') {
+    // Simple confetti implementation as fallback
+    window.confetti = function(options = {}) {
+        console.log("Using fallback confetti with options:", options);
+
+        const defaults = {
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.6, x: 0.5 },
+            colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+        };
+
+        // Merge options with defaults
+        const config = {...defaults, ...options };
+
+        // Create a simple visual effect if confetti doesn't load
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.pointerEvents = 'none';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+
+        // Create particles
+        for (let i = 0; i < config.particleCount; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '10px';
+                particle.style.height = '10px';
+                particle.style.borderRadius = '50%';
+                particle.style.backgroundColor = config.colors[Math.floor(Math.random() * config.colors.length)];
+
+                // Set starting position
+                const startX = (config.origin.x * window.innerWidth);
+                const startY = (config.origin.y * window.innerHeight);
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+
+                // Add to container
+                container.appendChild(particle);
+
+                // Animate
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 1 + Math.random() * 3;
+                const spread = (Math.random() - 0.5) * config.spread;
+
+                let posX = startX;
+                let posY = startY;
+
+                const intervalId = setInterval(() => {
+                    posX += Math.cos(angle) * velocity + spread;
+                    posY += Math.sin(angle) * velocity + 2; // Add gravity
+
+                    particle.style.left = posX + 'px';
+                    particle.style.top = posY + 'px';
+
+                    // Remove when out of screen
+                    if (posY > window.innerHeight) {
+                        clearInterval(intervalId);
+                        particle.remove();
+                    }
+                }, 20);
+
+                // Remove particles after animation
+                setTimeout(() => {
+                    clearInterval(intervalId);
+                    particle.remove();
+                }, 3000);
+            }, Math.random() * 500);
+        }
+
+        // Remove container after animation
+        setTimeout(() => {
+            container.remove();
+        }, 4000);
+
+        // Return an empty object to maintain API compatibility
+        return {};
+    };
+}
+
+// https://github.com/jayasurian123/fen-validator
+// js-chess-engine currently lacks a validator so use this
+import validateFEN from './fen-validator/index.js';
+
+// https://github.com/josefjadrny/js-chess-engine
+// Option 1 - With in-memory (should allow us to deal with promotion)
+import { Game } from './js-chess-engine/lib/js-chess-engine.mjs';
+let game = new Game();
+
+const fenPositions = ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8', 'a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7', 'a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6', 'a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5', 'a4', 'b4', 'c4', 'd4', 'e4', 'f4', 'g4', 'h4', 'a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3', 'a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2', 'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'];
+const pieces = ['r', 'n', 'b', 'q', 'k', 'p', 'R', 'N', 'B', 'Q', 'K', 'P'];
+const speed = 300;
+const game_version = '0.0.2';
+const chessFacts = [
+    "The longest official chess game ever was 269 moves long and ended in a draw.",
+    "The number of possible unique chess games is greater than the number of atoms in the universe.",
+    "The word 'Checkmate' comes from the Persian phrase 'Shah Mat,' which means 'the king is dead.'",
+    "The folding chess board was invented by a priest who was forbidden to play chess.",
+    "The first chess computer program was developed in 1951 by Alan Turing.",
+    "The shortest possible chess game ending in checkmate is just two moves.",
+    "The longest chess game theoretically possible is 5,949 moves.",
+    "The first chess tournament was held in London in 1851.",
+    "The chess piece originally known as the 'vizier' later became the queen we know today.",
+    "Chess is included in the curriculum in over 30 countries.",
+    "The oldest recorded chess game in history dates back to the 10th century.",
+    "In medieval times, chess was used to teach war strategy.",
+    "The knight is the only chess piece that can jump over other pieces.",
+    "The modern chess board design with alternating light and dark squares appeared in Europe in 1090.",
+    "Bobby Fischer became a chess grandmaster at the age of 15, the youngest ever at that time.",
+    "The first AI to defeat a world chess champion was IBM's Deep Blue in 1997.",
+    "The longest time for a player to make a move in a chess tournament was 2 hours and 20 minutes.",
+    "The most expensive chess set ever made is the Jewel Royale Chess Set, valued at $9.8 million.",
+    "In 1997, Garry Kasparov played against the entire world via the Internet and won.",
+    "The term 'Stalemate' comes from the Old French 'estale' meaning 'at a standstill.'",
+    "The queen is the most powerful piece on the chessboard, but was originally one of the weakest.",
+    "The International Chess Federation (FIDE) was founded in Paris in 1924.",
+    "Chess is one of the oldest games still played today, with origins dating back to 6th century India.",
+    "The longest chess marathon lasted 50 hours and 30 minutes.",
+    "The first chess book was written by Luis Ramirez de Lucena in 1497."
+];
+
+// Custom puzzles from simple to complex
+const customPuzzles = [
+    // Puzzle 1: White to Move and Checkmate in One
+    // Setup: White Pieces: King on g1, pawns on f2, g2, h2
+    //        Black Pieces: King on g8, pawns on f7, g7, h7
+    { puzzle_id: 'custom1', fen: '6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1', moves: ['f2f3', 'g8h8', 'f3f4', 'h8g8', 'f4f5', 'g8h8', 'f5f6', 'h8g8', 'f6f7', 'g8h8', 'f7f8Q'], rating: 500 },
+
+    // Puzzle 2: Black to Move and Checkmate in One
+    // Setup: White Pieces: King on g1, pawns on f2, g2, h2
+    //        Black Pieces: King on g8, pawns on f7, g7, h7, rook on f1
+    { puzzle_id: 'custom2', fen: '6k1/5ppp/8/8/8/8/5PPP/5rK1 b - - 0 1', moves: ['f1f2'], rating: 600 },
+
+    // Puzzle 3: Easy-Medium - White to Move and Win Material
+    // Setup: White Pieces: King on e1, queen on d1, rooks on a1 and h1, knights on f3 and g1, bishops on c1 and f1, pawns on a2, b2, c2, d2, e2, f2, g2, h2
+    //        Black Pieces: King on e8, queen on d8, rooks on a8 and h8, knights on b8 and g8, bishops on c8 and f8, pawns on a7, b7, c7, d7, f7, g7, h7, e5
+    { puzzle_id: 'custom3', fen: 'rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 1', moves: ['f3e5'], rating: 800 },
+
+    // Puzzle 4: Medium - Black to Move and Win a Piece
+    // Setup: White Pieces: King on e1, queen on d1, rooks on a1 and h1, knight on f3, pawns on a2, b2, c2, d2, e2, f2, g2, h2
+    //        Black Pieces: King on e8, queen on d8, rooks on a8 and h8, bishops on c8 and f8, knights on b8 and g8, pawns on a7, b7, c7, d7, f7, g7, h7, e5
+    { puzzle_id: 'custom4', fen: 'r1bqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1', moves: ['d8h4', 'g2g3', 'h4f6'], rating: 1000 },
+
+    // Puzzle 5: Medium - White to Move and Checkmate in Two
+    // Setup: White Pieces: King on g1, rook on f1, pawns on g2, h2
+    //        Black Pieces: King on g8, pawns on f7, g7, h7
+    { puzzle_id: 'custom5', fen: '6k1/5ppp/8/8/8/8/6PP/5RK1 w - - 0 1', moves: ['f1f8', 'g8h7', 'f8h8'], rating: 1200 },
+
+    // Puzzle 6: Medium - Black to Move and Checkmate in Two
+    // Setup: White Pieces: King on g1, pawns on f2, g2, h2
+    //        Black Pieces: King on g8, rook on f8, pawns on g7, h7
+    { puzzle_id: 'custom6', fen: '5rk1/6pp/8/8/8/8/5PPP/6K1 b - - 0 1', moves: ['f8f1', 'g1h2', 'f1f2'], rating: 1300 },
+
+    // Puzzle 7: Medium-Hard - White to Move and Find the Best Attack
+    // Setup: White Pieces: King on e1, queen on d1, rooks on a1 and h1, bishops on c1 and f1, knights on b1 and g1, pawns on a2, b2, c2, d2, f2, g2, h2, e5
+    //        Black Pieces: King on e8, queen on d8, rooks on a8 and h8, bishops on c8 and f8, knights on b8 and g8, pawns on a7, b7, c7, d7, e7, f7, g7, h7
+    { puzzle_id: 'custom7', fen: 'r1bqkbnr/pppp1ppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1', moves: ['d1h5', 'g7g6', 'h5e5'], rating: 1500 },
+
+    // Puzzle 8: Intermediate - Black to Move and Trap White's Queen
+    // Setup: White Pieces: King on e1, queen on d1, rooks on a1 and h1, bishops on c1 and f1, knight on f3, pawns on a2, b2, c2, d2, e2, f2, g2, h2
+    //        Black Pieces: King on e8, queen on d8, rooks on a8 and h8, bishops on c8 and f8, knights on b8 and g8, pawns on a7, b7, c7, d7, e5, f7, g7, h7
+    { puzzle_id: 'custom8', fen: 'rnbqkb1r/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQK2R b KQkq - 0 1', moves: ['c8g4'], rating: 1700 },
+
+    // Puzzle 9: Intermediate - White to Move and Checkmate in Three
+    // Setup: White Pieces: King on e1, queen on d1, rooks on a1 and h1, bishops on c1 and f1, knights on b1 and g1, pawns on a2, b2, c2, d2, f2, g2, h2, e5
+    //        Black Pieces: King on e8, queen on d8, rooks on a8 and h8, bishops on c8 and f8, knights on b8 and g8, pawns on a7, b7, c7, d7, e7, f7, g7, h7
+    { puzzle_id: 'custom9', fen: 'r1bqkbnr/pppp1ppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1', moves: ['g1f3', 'h7h6', 'f3g5', 'h6g5', 'e5f7'], rating: 1900 },
+
+    // Puzzle 10: Intermediate - Black to Move and Force Checkmate
+    // Setup: White Pieces: King on g1, rook on f1, pawns on g2, h2
+    //        Black Pieces: King on g8, pawns on g7, h7
+    { puzzle_id: 'custom10', fen: '6k1/6pp/8/8/8/8/6PP/5RK1 b - - 0 1', moves: ['h7h5', 'f1f8', 'g8h7', 'f8f7', 'h7h6'], rating: 2000 }
+];
+
+let puzzle_solved = false;
+let puzzle_solved_clean = true;
+let currentPuzzle = '';
+let currentFEN = '';
+let currentStatus = '';
+let lastPuzzleMoveIndex = 0;
+let puzzles = {};
+let params = '';
+let playerRating = 400;
+let timerInterval = null;
+let timeRemaining = 0;
+let puzzleIndex = 0;
+
+window.addEventListener("DOMContentLoaded", (event) => {
+    console.log("DOM fully loaded and parsed");
+
+    // Display a random chess fact
+    displayRandomChessFact();
+
+    // Hide the no-js message since JavaScript is clearly working
+    if (document.getElementById('no-js')) {
+        document.getElementById('no-js').style.display = 'none';
+    }
+
+    // Clear all pieces from the board to start with a clean state
+    clearAllPieces();
+
+    // Set up the board with proper event listeners
+    setUpBoard();
+    setUpButtons();
+
+    // Check if confetti is available and provide fallback if needed
+    if (typeof confetti === 'undefined') {
+        console.warn("Confetti library not loaded. Using fallback.");
+        window.confetti = function(options) {
+            console.log("Fallback confetti called");
+            return {};
+        };
+    }
+
+    // Add board-wide event delegation for handling clicks
+    const board = document.getElementById('board');
+    board.addEventListener('click', function(event) {
+        let targetSquare = event.target;
+
+        // If we clicked on a span, get its parent div (the square)
+        if (targetSquare.tagName.toLowerCase() === 'span') {
+            targetSquare = targetSquare.parentElement;
+        }
+
+        // Only handle clicks on board squares (divs)
+        if (targetSquare.tagName.toLowerCase() === 'div' && targetSquare.id) {
+            console.log(`Board click detected on square ${targetSquare.id}`);
+            squareClicked(targetSquare);
+        }
+    });
+
+    // Get URL parameters
+    params = getURLSearchParams();
+
+    // force set player rating if in params and is a number
+    if (params.get('rating') != null && !isNaN(params.get('rating'))) {
+        playerRating = params.get('rating');
+        storeLocalPlayerRating(playerRating);
+    } else {
+        playerRating = getLocalPlayerRating();
+    }
+
+    // Add timer display to the UI
+    const gameInfoElement = document.getElementById('game-info');
+    const timerElement = document.createElement('div');
+    timerElement.id = 'timer';
+    timerElement.className = 'timer';
+    timerElement.innerHTML = '10:00';
+    gameInfoElement.appendChild(timerElement);
+
+    // Create a container for buttons with improved styles
+    const buttonContainer = document.createElement('div');
+    buttonContainer.id = 'button-container';
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.flexDirection = 'column';
+    buttonContainer.style.gap = '15px';
+    buttonContainer.style.margin = '20px auto';
+    buttonContainer.style.maxWidth = '400px';
+    buttonContainer.style.padding = '0 20px';
+
+    // Add custom puzzles button with improved visibility
+    const customPuzzlesButton = document.createElement('button');
+    customPuzzlesButton.id = 'custom-puzzles-button';
+    customPuzzlesButton.innerHTML = 'Start 10-Puzzle Challenge (10 mins per puzzle)';
+    customPuzzlesButton.style.backgroundColor = '#4CAF50';
+    customPuzzlesButton.style.color = 'white';
+    customPuzzlesButton.style.border = 'none';
+    customPuzzlesButton.style.borderRadius = '8px';
+    customPuzzlesButton.style.padding = '15px 25px';
+    customPuzzlesButton.style.fontSize = '18px';
+    customPuzzlesButton.style.fontWeight = 'bold';
+    customPuzzlesButton.style.cursor = 'pointer';
+    customPuzzlesButton.style.marginBottom = '10px';
+    customPuzzlesButton.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+    customPuzzlesButton.addEventListener('click', startCustomPuzzleChallenge);
+    buttonContainer.appendChild(customPuzzlesButton);
+
+    // Add force start button with improved visibility
+    const forceStartButton = document.createElement('button');
+    forceStartButton.id = 'force-start-button';
+    forceStartButton.innerHTML = 'Start Chess Puzzles (1-10)';
+    forceStartButton.style.backgroundColor = '#FF9D23';
+    forceStartButton.style.color = 'white';
+    forceStartButton.style.border = 'none';
+    forceStartButton.style.borderRadius = '8px';
+    forceStartButton.style.padding = '15px 25px';
+    forceStartButton.style.fontSize = '18px';
+    forceStartButton.style.fontWeight = 'bold';
+    forceStartButton.style.cursor = 'pointer';
+    forceStartButton.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+    forceStartButton.addEventListener('click', forceCustomPuzzleStart);
+    buttonContainer.appendChild(forceStartButton);
+
+    // Create puzzle selection menu with improved visibility
+    const puzzleSelectContainer = document.createElement('div');
+    puzzleSelectContainer.id = 'puzzle-selector';
+    puzzleSelectContainer.style.display = 'flex';
+    puzzleSelectContainer.style.flexWrap = 'wrap';
+    puzzleSelectContainer.style.justifyContent = 'center';
+    puzzleSelectContainer.style.gap = '12px';
+    puzzleSelectContainer.style.margin = '20px auto';
+    puzzleSelectContainer.style.maxWidth = '600px';
+    puzzleSelectContainer.style.padding = '15px';
+    puzzleSelectContainer.style.backgroundColor = '#f5f5f5';
+    puzzleSelectContainer.style.borderRadius = '10px';
+    puzzleSelectContainer.style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+
+    // Add title for the puzzle selection with improved visibility
+    const puzzleSelectTitle = document.createElement('div');
+    puzzleSelectTitle.textContent = 'Select a Specific Puzzle:';
+    puzzleSelectTitle.style.width = '100%';
+    puzzleSelectTitle.style.textAlign = 'center';
+    puzzleSelectTitle.style.marginBottom = '15px';
+    puzzleSelectTitle.style.fontSize = '18px';
+    puzzleSelectTitle.style.fontWeight = 'bold';
+    puzzleSelectTitle.style.color = '#333';
+    puzzleSelectContainer.appendChild(puzzleSelectTitle);
+
+    // Create buttons for each puzzle with improved visibility
+    const puzzleTitles = [
+        "Puzzle 1: Checkmate in One (White)",
+        "Puzzle 2: Checkmate in One (Black)",
+        "Puzzle 3: Win Material (White)",
+        "Puzzle 4: Win a Piece (Black)",
+        "Puzzle 5: Mate in Two (White)",
+        "Puzzle 6: Mate in Two (Black)",
+        "Puzzle 7: Best Attack (White)",
+        "Puzzle 8: Trap Queen (Black)",
+        "Puzzle 9: Mate in Three (White)",
+        "Puzzle 10: Force Checkmate (Black)"
+    ];
+
+    for (let i = 0; i < customPuzzles.length; i++) {
+        const puzzleButton = document.createElement('button');
+        puzzleButton.textContent = `${i + 1}`;
+        puzzleButton.title = puzzleTitles[i];
+        puzzleButton.style.width = '45px';
+        puzzleButton.style.height = '45px';
+        puzzleButton.style.borderRadius = '50%';
+        puzzleButton.style.border = 'none';
+        puzzleButton.style.backgroundColor = '#ddd';
+        puzzleButton.style.cursor = 'pointer';
+        puzzleButton.style.fontSize = '18px';
+        puzzleButton.style.fontWeight = 'bold';
+        puzzleButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+
+        // Different colors based on difficulty
+        if (i < 2) {
+            puzzleButton.style.backgroundColor = '#90EE90'; // Light green for easy
+        } else if (i < 6) {
+            puzzleButton.style.backgroundColor = '#FFFF99'; // Light yellow for medium
+        } else {
+            puzzleButton.style.backgroundColor = '#FFA07A'; // Light salmon for hard
+        }
+
+        puzzleButton.addEventListener('click', () => {
+            loadSpecificPuzzle(i);
+        });
+
+        // Add hover effect
+        puzzleButton.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.1)';
+            this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        puzzleButton.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        });
+
+        puzzleSelectContainer.appendChild(puzzleButton);
+    }
+
+    // Get the board element to insert containers
+    const boardElement = document.getElementById('board');
+
+    // Make sure we insert the elements in the correct order
+    // First, add puzzleSelectContainer before buttonContainer
+    document.body.insertBefore(puzzleSelectContainer, boardElement.nextSibling);
+
+    // Then, add buttonContainer after puzzleSelectContainer
+    document.body.insertBefore(buttonContainer, puzzleSelectContainer.nextSibling);
+
+    // Initialize game with empty board
+    game = new Game();
+    currentStatus = game.exportJson();
+    currentFEN = '';
+
+    // Add hover effects to buttons
+    const buttons = document.querySelectorAll('button');
+    Array.from(buttons).forEach(button => {
+        button.addEventListener('mouseover', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.2)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        button.addEventListener('mouseout', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        });
+        button.addEventListener('mousedown', function() {
+            this.style.transform = 'translateY(1px)';
+            this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        });
+        button.addEventListener('mouseup', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.2)';
+        });
+    });
+
+    // Ensure the board is clear of all classes
+    console.log("Initial board setup complete");
+});
+
+function setUpBoard() {
+    console.log("Setting up board");
+
+    if (document.getElementById("no-js")) {
+        document.getElementById("no-js").remove();
+    }
+
+    // First, clear all pieces from the board
+    clearAllPieces();
+
+    const board = document.getElementById('board');
+    const squares = board.querySelectorAll('div');
+
+    console.log("Setting up board with", squares.length, "squares");
+
+    // Remove any existing event listeners
+    squares.forEach(square => {
+        const newSquare = square.cloneNode(true);
+        square.parentNode.replaceChild(newSquare, square);
+    });
+
+    // Get the updated squares after cloning
+    const updatedSquares = board.querySelectorAll('div');
+
+    // Ensure all squares have a span element and no piece classes
+    updatedSquares.forEach(square => {
+        // Remove all piece classes
+        pieces.forEach(piece => {
+            square.classList.remove(piece);
+        });
+
+        if (square.querySelector('span') === null) {
+            const span = document.createElement('span');
+            square.appendChild(span);
+        }
+
+        // Add event listeners directly
+        square.addEventListener('pointerdown', function(event) {
+            console.log(`Square ${square.id} was clicked!`);
+            squareClicked(square);
+        });
+    });
+
+    console.log("Board setup complete with all pieces cleared");
+}
+
+function setUpButtons() {
+    const title = document.getElementById('title');
+    const menuButton = document.getElementById('menu-button');
+    const closeButtons = document.querySelectorAll('.close-button');
+
+    title.addEventListener('dblclick', function() {
+        let element = document.getElementById('debug');
+        element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    });
+
+    menuButton.addEventListener('pointerdown', function() {
+        document.getElementById('info-modal').style.display = 'flex';
+    });
+
+    menuButton.addEventListener('pointerdown', function() {
+        document.getElementById('info-modal').style.display = 'flex';
+    });
+
+    closeButtons.forEach(closeButton => {
+        closeButton.addEventListener('pointerdown', function() {
+            this.parentNode.parentNode.style.display = 'none';
+        });
+    });
+}
+
+function unselectAll() {
+    const board = document.getElementById('board');
+    const squares = board.querySelectorAll('div');
+    squares.forEach(square => {
+        square.classList.remove('selected');
+        square.classList.remove('circle');
+    });
+}
+
+function clearBoard() {
+    console.log("Clearing board");
+    const board = document.getElementById('board');
+    const squares = board.querySelectorAll('div');
+    squares.forEach(square => {
+        // Preserve the span element
+        const span = square.querySelector('span');
+        square.className = '';
+
+        // Re-add the span if it was removed
+        if (!square.contains(span) && span) {
+            square.appendChild(span);
+        } else if (!square.querySelector('span')) {
+            const newSpan = document.createElement('span');
+            square.appendChild(newSpan);
+        }
+    });
+}
+
+function loadBoard(fen) {
+    console.log("Loading board with FEN:", fen);
+    const fenArr = fen.split(' ');
+    const piecePlacement = fenArr[0];
+
+    // Clear the board first by removing all piece classes
+    clearAllPieces();
+
+    // Process the FEN string: replace numbers with spaces and remove forward slashes
+    let newPiecePlacement = piecePlacement
+        .replace(/[0-8]/g, match => " ".repeat(parseInt(match)))
+        .replace(/\//g, '');
+
+    console.log("Processed piece placement:", newPiecePlacement);
+
+    // Add only the pieces specified in the FEN
+    for (let i = 0; i < newPiecePlacement.length; i++) {
+        const square = document.getElementById(fenPositions[i]);
+        if (!square) {
+            console.error(`Square with ID ${fenPositions[i]} not found!`);
+            continue;
+        }
+
+        if (newPiecePlacement[i] !== ' ') {
+            console.log(`Adding ${newPiecePlacement[i]} to ${fenPositions[i]}`);
+            square.classList.add(newPiecePlacement[i]);
+
+            // Ensure the square has a span element
+            if (!square.querySelector('span')) {
+                const span = document.createElement('span');
+                square.appendChild(span);
+            }
+        }
+    }
+
+    // Re-apply event listeners
+    const board = document.getElementById('board');
+    const squares = board.querySelectorAll('div');
+    squares.forEach(square => {
+        square.addEventListener('pointerdown', function(event) {
+            console.log(`Square ${square.id} was clicked!`);
+            squareClicked(square);
+        });
+    });
+}
+
+function flipBoard(shouldFlip) {
+    const board = document.getElementById('board');
+    if (shouldFlip) {
+        board.classList.add('flip');
+    } else {
+        board.classList.remove('flip');
+    }
+}
+
+function selectPiece(element) {
+    console.log("Selecting piece:", element.id, element.className);
+
+    const selectedPiece = currentStatus.pieces[element.id.toUpperCase()];
+    console.log("Selected piece from game state:", selectedPiece);
+
+    let canSelectPiece = false;
+    if (currentStatus.turn === 'white' && selectedPiece === selectedPiece.toUpperCase()) {
+        // white turn and white piece selected
+        canSelectPiece = true;
+    } else if (currentStatus.turn === 'black' && selectedPiece === selectedPiece.toLowerCase()) {
+        // black turn and black piece selected
+        canSelectPiece = true;
+    }
+
+    console.log("Can select piece:", canSelectPiece, "Current turn:", currentStatus.turn);
+
+    const selectedPieceValidMoves = currentStatus.moves[element.id.toUpperCase()];
+    console.log("Valid moves:", selectedPieceValidMoves);
+
+    if (canSelectPiece) {
+        element.classList.add('selected');
+
+        if (selectedPieceValidMoves && selectedPieceValidMoves.length) {
+            for (let i = 0; i < selectedPieceValidMoves.length; i++) {
+                const square = document.getElementById(selectedPieceValidMoves[i].toLowerCase());
+                square.classList.add('circle');
+            }
+        }
+    }
+}
+
+function computerMove(from, to) {
+    console.log(`Computer moving from ${from} to ${to}`);
+
+    // Check if the source and target squares exist
+    const fromSquare = document.getElementById(from);
+    const toSquare = document.getElementById(to);
+
+    if (!fromSquare || !toSquare) {
+        console.error(`Invalid move: ${from} to ${to} - squares not found`);
+        return;
+    }
+
+    // wait the specified delay then move piece
+    setTimeout(() => {
+        try {
+            movePiece(from, to);
+        } catch (error) {
+            console.error("Error in computerMove:", error);
+            // If there's an error in the move, try to recover
+            loadFen(currentPuzzle.fen);
+        }
+    }, speed);
+}
+
+function playerMove(from, to) {
+    console.log(`Attempting to move from ${from} to ${to}`);
+
+    try {
+        let best_move = currentPuzzle.moves[lastPuzzleMoveIndex];
+        console.log("Expected best move:", best_move);
+
+        // Check if move is solution - slice to avoid possible promotion char
+        if (best_move.slice(0, 4) === `${from}${to}`) {
+            console.log("Correct move!");
+            // If best_move is length 5, it has promotion
+            if (best_move.length === 5) {
+                // Grab char for promotion
+                puzzleMoveGood(from, to, best_move.slice(4));
+            } else {
+                puzzleMoveGood(from, to);
+            }
+        } else {
+            console.log("Incorrect move");
+            puzzleMoveBad(from, to);
+        }
+    } catch (error) {
+        console.error("Error in playerMove:", error);
+        // If there's an error, show an error message instead of making the move
+        updateMessage('<p>Error processing move. Please try again.</p>', 'bad');
+    }
+}
+
+function puzzleMoveGood(from, to, promote = null) {
+    movePiece(from, to, promote);
+    lastPuzzleMoveIndex++;
+
+    // Check if we've reached the end of the puzzle moves
+    if (currentStatus.isFinished || lastPuzzleMoveIndex >= currentPuzzle.moves.length) {
+        updateMessage(`<p>Puzzle ${puzzleIndex + 1} complete!</p><p>Great job!</p>`, 'good');
+        puzzle_solved = true;
+        stopTimer();
+
+        // Show congratulations with confetti immediately
+        showCongratulations();
+
+        // Update the puzzle button to show completion
+        const puzzleButtons = document.querySelectorAll('#puzzle-selector button');
+        if (puzzleButtons[puzzleIndex]) {
+            puzzleButtons[puzzleIndex].style.backgroundColor = '#90EE90'; // Green to indicate completion
+            puzzleButtons[puzzleIndex].style.color = '#006400'; // Dark green text
+            puzzleButtons[puzzleIndex].style.border = '2px solid #006400';
+        }
+
+        // Move to the next puzzle after a delay
+        setTimeout(() => {
+            puzzleIndex++;
+            if (puzzleIndex < customPuzzles.length) {
+                // Load the next puzzle
+                currentPuzzle = customPuzzles[puzzleIndex];
+                game = new Game(currentPuzzle.fen);
+                currentStatus = game.exportJson();
+                currentFEN = currentPuzzle.fen;
+
+                // Load the board with the new puzzle
+                loadBoard(currentFEN);
+
+                // Update puzzle message
+                const puzzleTitles = [
+                    "Puzzle 1 (Easy) – White to Move and Checkmate in One",
+                    "Puzzle 2 (Easy) – Black to Move and Checkmate in One",
+                    "Puzzle 3 (Easy-Medium) – White to Move and Win Material",
+                    "Puzzle 4 (Medium) – Black to Move and Win a Piece",
+                    "Puzzle 5 (Medium) – White to Move and Checkmate in Two",
+                    "Puzzle 6 (Medium) – Black to Move and Checkmate in Two",
+                    "Puzzle 7 (Medium-Hard) – White to Move and Find the Best Attack",
+                    "Puzzle 8 (Intermediate) – Black to Move and Trap White's Queen",
+                    "Puzzle 9 (Intermediate) – White to Move and Find Forced Mate in Three",
+                    "Puzzle 10 (Intermediate) – Black to Move and Force Checkmate"
+                ];
+
+                const puzzleDescriptions = [
+                    "Deliver checkmate in one move",
+                    "Find the checkmate in one move",
+                    "Find the best move for White to gain a material advantage",
+                    "Find the best move to win White's knight",
+                    "Find the sequence leading to checkmate in two moves",
+                    "Find the sequence leading to checkmate in two moves",
+                    "Find the best move for White to attack and put pressure on Black",
+                    "Find a way to trap White's queen",
+                    "Find the best way to checkmate in three moves",
+                    "Find the forcing sequence that leads to checkmate"
+                ];
+
+                updateMessage(`<p>${puzzleTitles[puzzleIndex]}</p><p>Your Move: ${puzzleDescriptions[puzzleIndex]}</p>`, '');
+
+                // Reset puzzle state
+                puzzle_solved = false;
+                lastPuzzleMoveIndex = 0;
+
+                // Flip board based on whose turn it is
+                if (currentStatus.turn === 'white') {
+                    flipBoard(false);
+                } else {
+                    flipBoard(true);
+                }
+
+                // Start new timer
+                startTimer(10 * 60);
+
+                // Update game info and debug
+                updateGameInfo();
+                updateDebug();
+
+                // Highlight the current puzzle button
+                highlightCurrentPuzzleButton(puzzleIndex);
+            } else {
+                // All puzzles completed
+                updateMessage('<p>Congratulations!</p><p>You\'ve completed all 10 puzzles!</p>', 'good');
+                document.getElementById('custom-puzzles-button').disabled = false;
+
+                // Show grand finale confetti
+                const duration = 8000;
+                const animationEnd = Date.now() + duration;
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+                const interval = setInterval(function() {
+                    const timeLeft = animationEnd - Date.now();
+
+                    if (timeLeft <= 0) {
+                        return clearInterval(interval);
+                    }
+
+                    const particleCount = 50 * (timeLeft / duration);
+
+                    // Multiple confetti bursts with random colors
+                    confetti(Object.assign({}, defaults, {
+                        particleCount,
+                        origin: { x: Math.random(), y: Math.random() - 0.2 },
+                        colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'],
+                    }));
+                }, 200);
+            }
+        }, 2000);
+    } else {
+        // For multi-move puzzles, show encouragement and make the computer's move
+        updateMessage('<p>Good move, keep going!</p>');
+
+        // Add a small delay before the computer makes its move
+        setTimeout(() => {
+            try {
+                const nextMove = currentPuzzle.moves[lastPuzzleMoveIndex];
+                const fromSquare = nextMove.substring(0, 2);
+                const toSquare = nextMove.substring(2, 4);
+
+                console.log(`Computer will move from ${fromSquare} to ${toSquare}`);
+                computerMove(fromSquare, toSquare);
+            } catch (error) {
+                console.error("Error making computer move:", error);
+            }
+        }, speed);
+    }
+}
+
+function puzzleMoveBad(from, to) {
+    const backupStatus = currentFEN;
+    const backupPrevious = document.querySelectorAll('.previous');
+    movePiece(from, to);
+    updateMessage('There is a better move, try again.', 'bad');
+    puzzle_solved_clean = false;
+    calculateRatingChange(currentPuzzle.rating, false);
+    setTimeout(() => {
+        loadFen(backupStatus);
+        backupPrevious.forEach(element => {
+            element.classList.add('previous');
+        });
+    }, speed);
+}
+
+function movePiece(from, to, promote = null) {
+    // Clear the board first
+    clearAllPieces();
+
+    // Make the move in the game engine
+    game.move(from, to);
+
+    // Handle promotion if specified
+    if (promote) {
+        if (currentStatus.turn === "white") {
+            game.setPiece(to, promote.toUpperCase());
+        } else {
+            game.setPiece(to, promote.toLowerCase());
+        }
+    }
+
+    // Update game state
+    currentStatus = game.exportJson();
+    currentFEN = game.exportFEN();
+
+    // Load only the pieces from the current FEN
+    loadBoard(currentFEN);
+
+    // Mark the squares involved in the move
+    document.getElementById(from).classList.add('previous');
+    document.getElementById(to).classList.add('previous');
+}
+
+const loadRandomPuzzle = () => {
+    const minRating = Math.max(0, getLocalPlayerRating() - 100);
+    const maxRating = getLocalPlayerRating() + 100;
+
+    const eligibleRatings = Object.keys(puzzles).filter(rating => rating >= minRating && rating <= maxRating);
+
+    if (eligibleRatings.length === 0) {
+        console.error('No puzzles found within the specified rating range.');
+        return;
+    }
+
+    const randomRating = eligibleRatings[Math.floor(Math.random() * eligibleRatings.length)];
+    const randomPuzzle = puzzles[randomRating][Math.floor(Math.random() * puzzles[randomRating].length)];
+
+    loadPuzzle(randomPuzzle);
+    puzzle_solved_clean = true;
+
+    disableNextPuzzle();
+}
+
+function updateMessage(text, type = '') {
+    const message = document.getElementById('message');
+    message.innerHTML = text;
+    message.classList = type;
+}
+
+function loadFen(fen) {
+    console.log("Loading FEN:", fen);
+    try {
+        if (validateFEN(fen)) {
+            // First, completely clear the board
+            clearAllPieces();
+
+            // Create a completely new game instance
+            game = new Game();
+
+            // Load the FEN into the game engine
+            game.loadFEN(fen);
+
+            // Update our state variables
+            currentFEN = fen;
+            currentStatus = game.exportJson();
+            console.log("Game status after loading FEN:", currentStatus);
+
+            // Now load only the pieces specified in the FEN
+            loadBoard(currentFEN);
+
+            console.log("Board loaded with specified pieces only");
+        } else {
+            console.error('Invalid FEN:', fen);
+            throw new Error('Invalid FEN');
+        }
+    } catch (error) {
+        console.error("Error in loadFen:", error);
+        // Fall back to starting position if there's an error
+        const startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+        currentFEN = startingFen;
+        game = new Game(startingFen);
+        currentStatus = game.exportJson();
+        loadBoard(currentFEN);
+    }
+}
+
+function loadPuzzle(puzzle) {
+    puzzle_solved = false;
+    currentPuzzle = puzzle;
+    loadFen(currentPuzzle.fen);
+    if (currentStatus.turn === 'white') {
+        updateMessage('<p>Find the best move for <u>black</u>.</p>');
+        flipBoard(true);
+    } else {
+        updateMessage('<p>Find the best move for <u>white</u>.</p>');
+        flipBoard(false);
+    }
+    computerMove(currentPuzzle.moves[0].substring(0, 2), currentPuzzle.moves[0].substring(2, 4));
+    lastPuzzleMoveIndex = 0;
+
+    updateGameInfo();
+    updateDebug();
+}
+
+function enableNextPuzzle() {
+    document.getElementById('message').addEventListener('click', loadRandomPuzzle);
+    document.getElementById('message').classList.add('clickable');
+}
+
+function disableNextPuzzle() {
+    document.getElementById('message').removeEventListener('click', loadRandomPuzzle);
+}
+
+function updateDebug() {
+    document.getElementById('debug').innerHTML = `
+    <strong>DEBUG INFO</strong>: 
+    Puzzle ID: <a href="https://lichess.org/training/${currentPuzzle.puzzle_id}">${currentPuzzle.puzzle_id}</a> - 
+    Puzzle Rating: ${currentPuzzle.rating} - 
+    Player Rating: ${getLocalPlayerRating()} 
+    `;
+}
+
+function updateGameInfo() {
+    document.getElementById('game-info').innerHTML = `
+    <em>Build v${game_version}</em><br>
+    Current Rating: <strong>${getLocalPlayerRating()}</strong><br>
+    `;
+}
+
+function initPuzzles(csvString) {
+    const lines = csvString.split('\n');
+    const puzzles = {};
+
+    lines.forEach(line => {
+        if (line.trim() !== '') {
+            const [puzzle_id, fen, moves, rating] = line.split(',');
+            const puzzle = { puzzle_id, fen, moves: moves.split(' '), rating };
+
+            if (!puzzles[rating]) {
+                puzzles[rating] = [];
+            }
+
+            puzzles[rating].push(puzzle);
+
+            // if a puzzle id was specified via URL
+            if (params.get('puzzle') === puzzle_id) {
+                puzzles['param'] = puzzle;
+            }
+        }
+    });
+
+    return puzzles;
+}
+
+function calculateRatingChange(puzzleRating, solved) {
+    const kFactor = 32; // K-factor determines the maximum rating change per game
+    const playerWinProbability = 1 / (1 + Math.pow(10, (puzzleRating - getLocalPlayerRating()) / 400));
+
+    const ratingChange = Math.round(kFactor * (solved ? 1 - playerWinProbability : 0 - playerWinProbability));
+
+    storeLocalPlayerRating(getLocalPlayerRating() + ratingChange);
+}
+
+// Store the player's rating in localStorage, if available
+function storeLocalPlayerRating(rating) {
+    try {
+        localStorage.setItem("quickChess4YouPlayerRating", rating);
+    } catch (error) {
+        console.error("Error storing player rating:", error);
+    }
+    playerRating = rating;
+}
+
+// Retrieve the player's rating from localStorage, if available
+function getLocalPlayerRating() {
+    try {
+        const rating = localStorage.getItem("quickChess4YouPlayerRating");
+        return rating ? parseInt(rating, 10) : 400;
+    } catch (error) {
+        console.error("Error retrieving player rating:", error);
+        return playerRating;
+    }
+}
+
+function getURLSearchParams() {
+    // Get the full URL (Example: https://puzzlechess.ca/?puzzle=123456)
+    const url = new URL(window.location.href);
+
+    // Access the URLSearchParams object
+    return new URLSearchParams(url.search);
+}
+
+function displayRandomChessFact() {
+    const factElement = document.querySelector('.chess-fact');
+    if (factElement) {
+        const randomIndex = Math.floor(Math.random() * chessFacts.length);
+        factElement.textContent = chessFacts[randomIndex];
+    }
+}
+
+// Function to show congratulations with confetti
+function showCongratulations() {
+    // Display more impressive confetti
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+    function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+            return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+
+        // Random colors
+        confetti(Object.assign({}, defaults, {
+            particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            colors: ['#FF0000', '#00FF00', '#0000FF'],
+        }));
+        confetti(Object.assign({}, defaults, {
+            particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            colors: ['#FF00FF', '#FFFF00', '#00FFFF'],
+        }));
+    }, 250);
+
+    // Create and show congratulations message with animation
+    let congratsMessage = document.getElementById('congrats-message');
+
+    if (!congratsMessage) {
+        congratsMessage = document.createElement('div');
+        congratsMessage.id = 'congrats-message';
+        document.body.appendChild(congratsMessage);
+    }
+
+    congratsMessage.innerHTML = `<h2>Excellent Job!</h2><p>You solved puzzle ${puzzleIndex + 1}!</p>`;
+    congratsMessage.style.position = 'fixed';
+    congratsMessage.style.top = '50%';
+    congratsMessage.style.left = '50%';
+    congratsMessage.style.transform = 'translate(-50%, -50%)';
+    congratsMessage.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    congratsMessage.style.padding = '20px 40px';
+    congratsMessage.style.borderRadius = '10px';
+    congratsMessage.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.2)';
+    congratsMessage.style.zIndex = '1000';
+    congratsMessage.style.textAlign = 'center';
+    congratsMessage.style.animation = 'popIn 0.5s forwards';
+
+    // Add a style for the animation if not already present
+    if (!document.getElementById('congrats-style')) {
+        const style = document.createElement('style');
+        style.id = 'congrats-style';
+        style.innerHTML = `
+            @keyframes popIn {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            }
+            @keyframes popOut {
+                0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    congratsMessage.style.display = 'block';
+
+    // Hide after animation completes
+    setTimeout(() => {
+        congratsMessage.style.animation = 'popOut 0.3s forwards';
+        setTimeout(() => {
+            congratsMessage.style.display = 'none';
+        }, 300);
+    }, 2500);
+}
+
+// Start the custom puzzle challenge with 10 puzzles and a timer
+function startCustomPuzzleChallenge() {
+    console.log("Starting custom puzzle challenge");
+    puzzleIndex = 0;
+
+    try {
+        // Initialize game with the first puzzle
+        currentPuzzle = customPuzzles[puzzleIndex];
+        game = new Game(currentPuzzle.fen);
+        currentStatus = game.exportJson();
+        currentFEN = currentPuzzle.fen;
+
+        // Load the board with the first puzzle
+        loadBoard(currentFEN);
+
+        // Update puzzle message
+        const puzzleTitles = [
+            "Puzzle 1 (Easy) – White to Move and Checkmate in One",
+            "Puzzle 2 (Easy) – Black to Move and Checkmate in One",
+            "Puzzle 3 (Easy-Medium) – White to Move and Win Material",
+            "Puzzle 4 (Medium) – Black to Move and Win a Piece",
+            "Puzzle 5 (Medium) – White to Move and Checkmate in Two",
+            "Puzzle 6 (Medium) – Black to Move and Checkmate in Two",
+            "Puzzle 7 (Medium-Hard) – White to Move and Find the Best Attack",
+            "Puzzle 8 (Intermediate) – Black to Move and Trap White's Queen",
+            "Puzzle 9 (Intermediate) – White to Move and Find Forced Mate in Three",
+            "Puzzle 10 (Intermediate) – Black to Move and Force Checkmate"
+        ];
+
+        const puzzleDescriptions = [
+            "Deliver checkmate in one move",
+            "Find the checkmate in one move",
+            "Find the best move for White to gain a material advantage",
+            "Find the best move to win White's knight",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the best move for White to attack and put pressure on Black",
+            "Find a way to trap White's queen",
+            "Find the best way to checkmate in three moves",
+            "Find the forcing sequence that leads to checkmate"
+        ];
+
+        updateMessage(`<p>${puzzleTitles[puzzleIndex]}</p><p>Your Move: ${puzzleDescriptions[puzzleIndex]}</p>`, '');
+
+        // Flip board based on whose turn it is
+        if (currentStatus.turn === 'white') {
+            flipBoard(false);
+        } else {
+            flipBoard(true);
+        }
+
+        // Reset puzzle state
+        puzzle_solved = false;
+        lastPuzzleMoveIndex = 0;
+
+        // Start the timer
+        startTimer(10 * 60);
+
+        // Disable the start button
+        document.getElementById('custom-puzzles-button').disabled = true;
+
+        // Update game info and debug
+        updateGameInfo();
+        updateDebug();
+
+    } catch (error) {
+        console.error("Error starting puzzle challenge:", error);
+        updateMessage('<p>Error starting puzzles.</p><p>Please try refreshing the page.</p>', 'bad');
+    }
+}
+
+// Function to completely clear all pieces from the board
+function clearAllPieces() {
+    console.log("Clearing all pieces from the board");
+
+    try {
+        const board = document.getElementById('board');
+        if (!board) {
+            console.error("Board element not found!");
+            return;
+        }
+
+        const squares = board.querySelectorAll('div');
+        if (squares.length === 0) {
+            console.error("No squares found on the board!");
+            return;
+        }
+
+        console.log(`Clearing ${squares.length} squares`);
+
+        // Remove all piece classes from each square
+        squares.forEach(square => {
+            // Clear all classes first
+            const squareId = square.id;
+            const squareClasses = [...square.classList];
+
+            // Remove each piece class individually
+            pieces.forEach(piece => {
+                if (square.classList.contains(piece)) {
+                    console.log(`Removing ${piece} from ${squareId}`);
+                    square.classList.remove(piece);
+                }
+            });
+
+            // As a fallback, reset all classes completely
+            if (squareClasses.some(cls => pieces.includes(cls))) {
+                const originalClasses = square.className;
+                square.className = ''; // Clear all classes
+                console.log(`Reset all classes on ${squareId} from "${originalClasses}" to ""`);
+            }
+
+            // Ensure each square has a span element
+            if (!square.querySelector('span')) {
+                const span = document.createElement('span');
+                square.appendChild(span);
+                console.log(`Added missing span to ${squareId}`);
+            }
+        });
+
+        console.log("Board completely cleared of all pieces");
+    } catch (error) {
+        console.error("Error in clearAllPieces:", error);
+    }
+}
+
+// Load a custom puzzle by index
+function loadCustomPuzzle(index) {
+    console.log("Loading custom puzzle", index);
+    if (index >= customPuzzles.length) {
+        updateMessage('<p>Challenge completed!</p><p>All 10 puzzles finished!</p>', 'good');
+        stopTimer();
+        document.getElementById('custom-puzzles-button').disabled = false;
+        return;
+    }
+
+    puzzle_solved = false;
+    currentPuzzle = customPuzzles[index];
+
+    // Debug the puzzle being loaded
+    console.log("Current puzzle:", currentPuzzle);
+
+    try {
+        // First clear all pieces from the board
+        const board = document.getElementById('board');
+        const squares = board.querySelectorAll('div');
+        squares.forEach(square => {
+            // Remove all piece classes
+            pieces.forEach(piece => {
+                square.classList.remove(piece);
+            });
+            // Ensure span element exists
+            if (!square.querySelector('span')) {
+                const span = document.createElement('span');
+                square.appendChild(span);
+            }
+        });
+
+        // Initialize game with empty board
+        game = new Game();
+
+        // Load only the specified FEN
+        game.loadFEN(currentPuzzle.fen);
+        currentStatus = game.exportJson();
+        currentFEN = currentPuzzle.fen;
+
+        // Load only the pieces specified in the FEN
+        const fenParts = currentPuzzle.fen.split(' ');
+        const piecePlacement = fenParts[0];
+
+        // Convert FEN piece placement to board positions
+        let position = 0;
+        for (let i = 0; i < piecePlacement.length; i++) {
+            const char = piecePlacement[i];
+            if (char === '/') {
+                continue;
+            } else if (/[1-8]/.test(char)) {
+                position += parseInt(char);
+            } else {
+                const square = document.getElementById(fenPositions[position]);
+                if (square) {
+                    square.classList.add(char);
+                }
+                position++;
+            }
+        }
+
+        // Get puzzle descriptions based on the index
+        const puzzleDescriptions = [
+            "Deliver checkmate in one move",
+            "Find the checkmate in one move",
+            "Find the best move for White to gain a material advantage",
+            "Find the best move to win White's knight",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the best move for White to attack and put pressure on Black",
+            "Find a way to trap White's queen",
+            "Find the best way to checkmate in three moves",
+            "Find the forcing sequence that leads to checkmate"
+        ];
+
+        // Get puzzle titles
+        const puzzleTitles = [
+            "Puzzle 1 (Easy) – White to Move and Checkmate in One",
+            "Puzzle 2 (Easy) – Black to Move and Checkmate in One",
+            "Puzzle 3 (Easy-Medium) – White to Move and Win Material",
+            "Puzzle 4 (Medium) – Black to Move and Win a Piece",
+            "Puzzle 5 (Medium) – White to Move and Checkmate in Two",
+            "Puzzle 6 (Medium) – Black to Move and Checkmate in Two",
+            "Puzzle 7 (Medium-Hard) – White to Move and Find the Best Attack",
+            "Puzzle 8 (Intermediate) – Black to Move and Trap White's Queen",
+            "Puzzle 9 (Intermediate) – White to Move and Find Forced Mate in Three",
+            "Puzzle 10 (Intermediate) – Black to Move and Force Checkmate"
+        ];
+
+        // Update puzzle message
+        updateMessage(`<p>${puzzleTitles[index]}</p><p>Your Move: ${puzzleDescriptions[index]}</p>`, '');
+
+        // Flip the board based on whose turn it is
+        if (currentStatus.turn === 'white') {
+            flipBoard(false);
+        } else {
+            flipBoard(true);
+        }
+
+        lastPuzzleMoveIndex = 0;
+        updateGameInfo();
+        updateDebug();
+
+        // Start a 10-minute timer for this puzzle
+        startTimer(10 * 60);
+
+    } catch (error) {
+        console.error("Error loading puzzle:", error);
+        // Try to load the next puzzle
+        puzzleIndex++;
+        loadCustomPuzzle(puzzleIndex);
+    }
+}
+
+// Start a timer with given seconds
+function startTimer(seconds) {
+    // Clear any existing timer
+    stopTimer();
+
+    timeRemaining = seconds;
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            handleTimeUp();
+        }
+    }, 1000);
+}
+
+// Stop the timer
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+// Update the timer display
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    document.getElementById('timer').innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Handle when time is up
+function handleTimeUp() {
+    updateMessage('<p>Time\'s up!</p><p>Moving to the next puzzle.</p>', 'bad');
+
+    // Move to the next puzzle after a delay
+    setTimeout(() => {
+        puzzleIndex++;
+        loadCustomPuzzle(puzzleIndex);
+    }, 2000);
+}
+
+// Function to fetch puzzles with a fallback to custom puzzles
+function fetchPuzzlesWithFallback() {
+    // Clear all pieces from the board first
+    clearAllPieces();
+
+    fetch('./puzzles/offline/puzzles.csv')
+        .then(response => {
+            console.log("Fetch response status:", response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(csvString => {
+            console.log("Puzzles loaded successfully");
+            puzzles = initPuzzles(csvString);
+
+            // Clear board before loading puzzles
+            clearAllPieces();
+
+            if (puzzles['param'] == null) {
+                loadRandomPuzzle();
+            } else {
+                loadPuzzle(puzzles['param']);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching puzzles:', error);
+            // Fall back to using custom puzzles
+            console.log("Falling back to custom puzzles");
+
+            // Clear board before loading custom puzzles
+            clearAllPieces();
+
+            puzzleIndex = 0;
+            loadCustomPuzzle(puzzleIndex);
+
+            const noJsElement = document.getElementById('no-js');
+            if (noJsElement) {
+                noJsElement.style.display = 'block';
+                noJsElement.innerHTML = `<strong>Using custom puzzles due to error:</strong> ${error.message}`;
+                // Hide the error message after 3 seconds
+                setTimeout(() => {
+                    noJsElement.style.display = 'none';
+                }, 3000);
+            }
+        });
+}
+
+const squareClicked = (square) => {
+    console.log(`${square.id} was clicked!`);
+
+    if (puzzle_solved) {
+        console.log("Puzzle already solved, ignoring click");
+        return;
+    }
+
+    // You may be tempted to refactor, but why?
+    // unselectAll is catching **edge case** for multiple selected squares
+    // you still need to unselect the selected square, if user wants to undo selection
+    if (square.classList.contains('selected')) {
+        console.log("Unselecting selected square");
+        unselectAll();
+    } else if (square.classList.contains('circle')) {
+        console.log("Moving to highlighted square");
+        const selected = document.querySelector('.selected');
+        if (selected) {
+            console.log("Found selected piece:", selected.id);
+            unselectAll();
+            playerMove(selected.id, square.id);
+        } else {
+            console.error("No selected piece found!");
+        }
+    } else {
+        console.log("Checking if square contains a piece");
+        unselectAll();
+
+        let containsPiece = false;
+        for (let i = 0; i < pieces.length; i++) {
+            if (square.classList.contains(pieces[i])) {
+                containsPiece = true;
+                console.log(`Square contains piece: ${pieces[i]}`);
+                break;
+            }
+        }
+
+        // only add selected if piece exists
+        if (containsPiece) {
+            console.log("Selecting piece");
+            selectPiece(square);
+        } else {
+            console.log("No piece to select");
+        }
+    }
+};
+
+// This function helps ensure we're ready to play
+function forceCustomPuzzleStart() {
+    console.log("Forcing custom puzzle start");
+
+    try {
+        // Clear the UI and reset state
+        console.log("Clearing board for fresh start");
+        clearAllPieces();
+        puzzleIndex = 0;
+        puzzle_solved = false;
+        lastPuzzleMoveIndex = 0;
+
+        // Create a new game instance
+        game = new Game();
+
+        // Load the first puzzle
+        console.log("Loading first puzzle");
+        currentPuzzle = customPuzzles[puzzleIndex];
+
+        // Initialize with the puzzle's FEN
+        game = new Game(currentPuzzle.fen);
+        currentStatus = game.exportJson();
+        currentFEN = currentPuzzle.fen;
+
+        console.log("Puzzle FEN:", currentFEN);
+        console.log("Current turn:", currentStatus.turn);
+
+        // Load the board with just the pieces in the FEN
+        loadBoard(currentFEN);
+
+        // Update message with puzzle info
+        const puzzleTitles = [
+            "Puzzle 1 (Easy) – White to Move and Checkmate in One",
+            "Puzzle 2 (Easy) – Black to Move and Checkmate in One",
+            "Puzzle 3 (Easy-Medium) – White to Move and Win Material",
+            "Puzzle 4 (Medium) – Black to Move and Win a Piece",
+            "Puzzle 5 (Medium) – White to Move and Checkmate in Two",
+            "Puzzle 6 (Medium) – Black to Move and Checkmate in Two",
+            "Puzzle 7 (Medium-Hard) – White to Move and Find the Best Attack",
+            "Puzzle 8 (Intermediate) – Black to Move and Trap White's Queen",
+            "Puzzle 9 (Intermediate) – White to Move and Find Forced Mate in Three",
+            "Puzzle 10 (Intermediate) – Black to Move and Force Checkmate"
+        ];
+
+        const puzzleDescriptions = [
+            "Deliver checkmate in one move",
+            "Find the checkmate in one move",
+            "Find the best move for White to gain a material advantage",
+            "Find the best move to win White's knight",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the sequence leading to checkmate in two moves",
+            "Find the best move for White to attack and put pressure on Black",
+            "Find a way to trap White's queen",
+            "Find the best way to checkmate in three moves",
+            "Find the forcing sequence that leads to checkmate"
+        ];
+
+        updateMessage(`<p>${puzzleTitles[puzzleIndex]}</p><p>Your Move: ${puzzleDescriptions[puzzleIndex]}</p>`, '');
+
+        // Flip the board based on whose turn it is
+        if (currentStatus.turn === 'white') {
+            flipBoard(false);
+        } else {
+            flipBoard(true);
+        }
+
+        // Start a 10-minute timer for this puzzle
+        startTimer(10 * 60);
+
+        // Update game info and debug
+        updateGameInfo();
+        updateDebug();
+
+        // Highlight the current puzzle button
+        highlightCurrentPuzzleButton(puzzleIndex);
+
+        console.log("First puzzle loaded successfully");
+    } catch (error) {
+        console.error("Error forcing custom puzzle start:", error);
+        // Display error to user
+        updateMessage('<p>Error loading puzzles.</p><p>Please try refreshing the page.</p>', 'bad');
+    }
+}
+
+// Add this new function for loading a specific puzzle
+function loadSpecificPuzzle(index) {
+    console.log("Loading specific puzzle:", index);
+    puzzleIndex = index;
+
+    // Clear all pieces first
+    clearAllPieces();
+
+    // Reset puzzle state
+    puzzle_solved = false;
+    lastPuzzleMoveIndex = 0;
+
+    // Load the selected puzzle
+    currentPuzzle = customPuzzles[index];
+    game = new Game(currentPuzzle.fen);
+    currentStatus = game.exportJson();
+    currentFEN = currentPuzzle.fen;
+
+    // Load the board with the selected puzzle
+    loadBoard(currentFEN);
+
+    // Get puzzle descriptions and titles
+    const puzzleDescriptions = [
+        "Deliver checkmate in one move",
+        "Find the checkmate in one move",
+        "Find the best move for White to gain a material advantage",
+        "Find the best move to win White's knight",
+        "Find the sequence leading to checkmate in two moves",
+        "Find the sequence leading to checkmate in two moves",
+        "Find the best move for White to attack and put pressure on Black",
+        "Find a way to trap White's queen",
+        "Find the best way to checkmate in three moves",
+        "Find the forcing sequence that leads to checkmate"
+    ];
+
+    const puzzleTitles = [
+        "Puzzle 1 (Easy) – White to Move and Checkmate in One",
+        "Puzzle 2 (Easy) – Black to Move and Checkmate in One",
+        "Puzzle 3 (Easy-Medium) – White to Move and Win Material",
+        "Puzzle 4 (Medium) – Black to Move and Win a Piece",
+        "Puzzle 5 (Medium) – White to Move and Checkmate in Two",
+        "Puzzle 6 (Medium) – Black to Move and Checkmate in Two",
+        "Puzzle 7 (Medium-Hard) – White to Move and Find the Best Attack",
+        "Puzzle 8 (Intermediate) – Black to Move and Trap White's Queen",
+        "Puzzle 9 (Intermediate) – White to Move and Find Forced Mate in Three",
+        "Puzzle 10 (Intermediate) – Black to Move and Force Checkmate"
+    ];
+
+    // Update puzzle message
+    updateMessage(`<p>${puzzleTitles[index]}</p><p>Your Move: ${puzzleDescriptions[index]}</p>`, '');
+
+    // Flip board based on whose turn it is
+    if (currentStatus.turn === 'white') {
+        flipBoard(false);
+    } else {
+        flipBoard(true);
+    }
+
+    // Start new timer
+    startTimer(10 * 60);
+
+    // Update game info and debug
+    updateGameInfo();
+    updateDebug();
+
+    // Highlight the currently selected puzzle button
+    highlightCurrentPuzzleButton(index);
+}
+
+// Function to highlight the current puzzle button
+function highlightCurrentPuzzleButton(index) {
+    // Remove highlight from all buttons
+    const puzzleButtons = document.querySelectorAll('#puzzle-selector button');
+    puzzleButtons.forEach((button, i) => {
+        button.style.border = 'none';
+        button.style.outline = 'none';
+    });
+
+    // Add highlight to the current puzzle button
+    if (puzzleButtons[index]) {
+        puzzleButtons[index].style.border = '3px solid #007bff';
+        puzzleButtons[index].style.outline = 'none';
+    }
+}
