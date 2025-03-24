@@ -1,0 +1,129 @@
+.chess-board-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.message {
+    font-size: 1.2rem;
+    color: #333;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    width: 100%;
+    max-width: 400px;
+}
+
+#board {
+    width: 400px;
+    height: 400px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    border: 2px solid #000;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-size: 35px;
+    cursor: pointer;
+}
+
+.square:nth-child(odd) {
+    background: #fff;
+}
+
+.square:nth-child(even) {
+    background: #ccc;
+}
+
+
+/* White pieces */
+
+.square .P::after {
+    content: '♙';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.square .R::after {
+    content: '♖';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.square .N::after {
+    content: '♘';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.square .B::after {
+    content: '♗';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.square .Q::after {
+    content: '♕';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.square .K::after {
+    content: '♔';
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+
+/* Black pieces */
+
+.square .p::after {
+    content: '♟';
+    color: black;
+}
+
+.square .r::after {
+    content: '♜';
+    color: black;
+}
+
+.square .n::after {
+    content: '♞';
+    color: black;
+}
+
+.square .b::after {
+    content: '♝';
+    color: black;
+}
+
+.square .q::after {
+    content: '♛';
+    color: black;
+}
+
+.square .k::after {
+    content: '♚';
+    color: black;
+}
+
+.square.selected {
+    background-color: #ffff00 !important;
+}
+
+.square.possible-move {
+    background-color: #90EE90 !important;
+}
+
+.square:hover {
+    opacity: 0.8;
+}

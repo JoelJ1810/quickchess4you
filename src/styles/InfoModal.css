@@ -1,0 +1,69 @@
+#info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#info-modal>div {
+    background-color: white;
+    padding: 2em;
+    border-radius: var(--corner-radius);
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5em;
+    width: 48px;
+}
+
+.close-button svg {
+    width: 100%;
+    height: 100%;
+    fill: #FF9D23;
+}
+
+.close-button span {
+    font-size: 0.8em;
+    color: #FF9D23;
+}
+
+#info-modal h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1em;
+}
+
+#info-modal h2 {
+    margin: 1em 0 0.5em;
+}
+
+#info-modal p {
+    margin: 0.5em 0;
+}
+
+.chess-fact {
+    font-style: italic;
+    color: #666;
+    margin-top: 1em;
+    padding: 1em;
+    background-color: #f5f5f5;
+    border-radius: var(--corner-radius);
+}

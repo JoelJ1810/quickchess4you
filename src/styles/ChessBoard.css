@@ -1,0 +1,142 @@
+#board {
+    background-color: var(--light);
+    color: var(--dark);
+    display: flex;
+    flex-flow: column-reverse wrap;
+    height: calc(var(--square) * 8);
+    width: calc(var(--square) * 8);
+    border-radius: var(--corner-radius);
+}
+
+#board.flip {
+    flex-flow: column wrap-reverse;
+}
+
+#board div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--square);
+    min-height: var(--square);
+    overflow: hidden;
+}
+
+#board div.selected {
+    color: var(--selected-text);
+}
+
+#board div.selected span {
+    background-color: var(--selected);
+}
+
+#board div.possible-move span {
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background-color: var(--selected);
+}
+
+
+/* Chess pieces */
+
+#board div.p span {
+    background-image: url('/media/chess_pawn_black.svg');
+}
+
+#board div.r span {
+    background-image: url('/media/chess_rook_black.svg');
+}
+
+#board div.n span {
+    background-image: url('/media/chess_knight_black.svg');
+}
+
+#board div.b span {
+    background-image: url('/media/chess_bishop_black.svg');
+}
+
+#board div.q span {
+    background-image: url('/media/chess_queen_black.svg');
+}
+
+#board div.k span {
+    background-image: url('/media/chess_king_black.svg');
+}
+
+#board div.P span {
+    background-image: url('/media/chess_pawn_white.svg');
+}
+
+#board div.R span {
+    background-image: url('/media/chess_rook_white.svg');
+}
+
+#board div.N span {
+    background-image: url('/media/chess_knight_white.svg');
+}
+
+#board div.B span {
+    background-image: url('/media/chess_bishop_white.svg');
+}
+
+#board div.Q span {
+    background-image: url('/media/chess_queen_white.svg');
+}
+
+#board div.K span {
+    background-image: url('/media/chess_king_white.svg');
+}
+
+
+/* Square colors */
+
+#board div:nth-child(odd) {
+    background-color: var(--dark);
+}
+
+#board div:nth-child(even) {
+    background-color: var(--light);
+}
+
+
+/* Piece spans */
+
+#board div span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+/* Hover effects */
+
+#board div.possible-move:hover {
+    cursor: pointer;
+}
+
+#board div.possible-move:hover span {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background-color: var(--selected);
+}
+
+.chess-board {
+    width: 600px;
+    height: 600px;
+    border: 2px solid #333;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.chess-board h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}

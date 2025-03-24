@@ -1,0 +1,35 @@
+#message {
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: var(--corner-radius);
+    background-color: var(--message-neutral);
+    color: var(--message-neutral-text);
+    max-width: calc(var(--square) * 8);
+    width: 100%;
+}
+
+#message.good {
+    background-color: var(--message-good);
+    color: var(--message-good-text);
+}
+
+#message.bad {
+    background-color: var(--message-bad);
+    color: var(--message-bad-text);
+}
+
+#message p {
+    margin: 0;
+}
+
+#message a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: calc(64px * 8)) {
+    #message {
+        margin: 1em;
+        width: calc(100% - 2em);
+    }
+}

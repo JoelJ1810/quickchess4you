@@ -1,0 +1,67 @@
+#game-info {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 600px;
+    width: 90%;
+}
+
+#user-stats {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#user-stats p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+#user-stats span {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.game-info {
+    width: 300px;
+    padding: 20px;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.game-info h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.stat-item label {
+    color: #666;
+    font-weight: 500;
+}
+
+.stat-item span {
+    color: #333;
+    font-weight: 600;
+}
