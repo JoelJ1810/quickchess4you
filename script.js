@@ -170,7 +170,7 @@ const customPuzzles = [
         puzzle_id: 'custom8',
         fen: '3N4/KPP1p3/3k4/4R3/3P4/6R1/7B/8 w - - 1 1',
         moves: [
-            'e1c1', // 1.O-O-O (castling queenside) - fixing to use valid castling move
+            'e1c1', // 1.O-O-O (castling queenside)
             'd6c7', // 1...Kxc7 (main line)
             'd5d5' // 2.Rd5#
         ],
@@ -934,13 +934,6 @@ function playerMove(from, to) {
                     updateMessage(`<p>Checkmate!</p><p>Brilliant knight maneuver!</p>`, 'good');
                     puzzle_solved = true;
 
-                    // Update the puzzle button to green
-                    const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                    if (puzzleBtn) {
-                        puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                        puzzleBtn.style.color = 'white';
-                    }
-
                     // Auto advance to next puzzle
                     showCongratulations(true);
                     return;
@@ -977,13 +970,6 @@ function playerMove(from, to) {
                             updateMessage(`<p>Checkmate!</p><p>Brilliant knight maneuver!</p>`, 'good');
                             puzzle_solved = true;
 
-                            // Update the puzzle button to green
-                            const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                            if (puzzleBtn) {
-                                puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                                puzzleBtn.style.color = 'white';
-                            }
-
                             // Auto advance to next puzzle
                             showCongratulations(true);
                         } else {
@@ -998,13 +984,6 @@ function playerMove(from, to) {
                 return;
             } else {
                 console.log(`INCORRECT move for puzzle 7. Got: ${from}${to}`);
-
-                // Update the puzzle button to red
-                const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                if (puzzleBtn) {
-                    puzzleBtn.style.backgroundColor = '#FF6347'; // Red for failed
-                    puzzleBtn.style.color = 'white';
-                }
 
                 // Increment wrong move counter
                 if (!window.wrongMoveCount) window.wrongMoveCount = {};
@@ -1115,13 +1094,6 @@ function playerMove(from, to) {
                     updateMessage(`<p>Checkmate!</p><p>Brilliant bishop maneuver!</p>`, 'good');
                     puzzle_solved = true;
 
-                    // Update the puzzle button to green
-                    const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                    if (puzzleBtn) {
-                        puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                        puzzleBtn.style.color = 'white';
-                    }
-
                     // Auto advance to next puzzle
                     showCongratulations(true);
                     return;
@@ -1158,13 +1130,6 @@ function playerMove(from, to) {
                             updateMessage(`<p>Checkmate!</p><p>Brilliant bishop maneuver!</p>`, 'good');
                             puzzle_solved = true;
 
-                            // Update the puzzle button to green
-                            const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                            if (puzzleBtn) {
-                                puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                                puzzleBtn.style.color = 'white';
-                            }
-
                             // Auto advance to next puzzle
                             showCongratulations(true);
                         } else {
@@ -1179,13 +1144,6 @@ function playerMove(from, to) {
                 return;
             } else {
                 console.log(`INCORRECT move for puzzle 9. Got: ${from}${to}`);
-
-                // Update the puzzle button to red
-                const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                if (puzzleBtn) {
-                    puzzleBtn.style.backgroundColor = '#FF6347'; // Red for failed
-                    puzzleBtn.style.color = 'white';
-                }
 
                 // Increment wrong move counter
                 if (!window.wrongMoveCount) window.wrongMoveCount = {};
@@ -1220,13 +1178,6 @@ function playerMove(from, to) {
                     console.log("Puzzle 10 completed!");
                     updateMessage(`<p>Checkmate!</p><p>Brilliant mate in two!</p>`, 'good');
                     puzzle_solved = true;
-
-                    // Update the puzzle button to green
-                    const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                    if (puzzleBtn) {
-                        puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                        puzzleBtn.style.color = 'white';
-                    }
 
                     // Show congratulations as this is the last puzzle
                     showCongratulations(false);
@@ -1264,14 +1215,7 @@ function playerMove(from, to) {
                             updateMessage(`<p>Checkmate!</p><p>Brilliant mate in two!</p>`, 'good');
                             puzzle_solved = true;
 
-                            // Update the puzzle button to green
-                            const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                            if (puzzleBtn) {
-                                puzzleBtn.style.backgroundColor = '#4CAF50'; // Green for success
-                                puzzleBtn.style.color = 'white';
-                            }
-
-                            // Show congratulations but don't advance (it's the last puzzle)
+                            // Show congratulations as this is the last puzzle
                             showCongratulations(false);
                         } else {
                             // Provide feedback to indicate player's next move
@@ -1285,13 +1229,6 @@ function playerMove(from, to) {
                 return;
             } else {
                 console.log(`INCORRECT move for puzzle 10. Got: ${from}${to}`);
-
-                // Update the puzzle button to red
-                const puzzleBtn = document.querySelector(`.puzzle-btn:nth-child(${currentPuzzleIndex})`);
-                if (puzzleBtn) {
-                    puzzleBtn.style.backgroundColor = '#FF6347'; // Red for failed
-                    puzzleBtn.style.color = 'white';
-                }
 
                 // Increment wrong move counter
                 if (!window.wrongMoveCount) window.wrongMoveCount = {};
@@ -1592,24 +1529,33 @@ function movePiece(from, to, promote = null) {
 }
 
 const loadRandomPuzzle = () => {
-    const minRating = Math.max(0, getLocalPlayerRating() - 100);
-    const maxRating = getLocalPlayerRating() + 100;
+    console.log("Loading random puzzle");
+    try {
+        // Get a random puzzle from our custom puzzles
+        const randomIndex = Math.floor(Math.random() * customPuzzles.length);
+        const puzzle = customPuzzles[randomIndex];
 
-    const eligibleRatings = Object.keys(puzzles).filter(rating => rating >= minRating && rating <= maxRating);
+        // Set up the puzzle
+        currentPuzzle = puzzle;
+        currentFEN = puzzle.fen;
+        game = new Game(puzzle.fen);
+        currentStatus = game.exportJson();
 
-    if (eligibleRatings.length === 0) {
-        console.error('No puzzles found within the specified rating range.');
-        return;
+        // Load the board
+        loadBoard(currentFEN);
+
+        // Update message
+        updateMessage(`<p>Random Puzzle ${randomIndex + 1}</p><p>Find the best move</p>`, '');
+
+        // Make sure board is interactive
+        ensureBoardIsInteractive();
+
+        console.log("Random puzzle loaded successfully");
+    } catch (error) {
+        console.error("Error loading random puzzle:", error);
+        updateMessage('<p>Error loading random puzzle. Please try again.</p>', 'bad');
     }
-
-    const randomRating = eligibleRatings[Math.floor(Math.random() * eligibleRatings.length)];
-    const randomPuzzle = puzzles[randomRating][Math.floor(Math.random() * puzzles[randomRating].length)];
-
-    loadPuzzle(randomPuzzle);
-    puzzle_solved_clean = true;
-
-    disableNextPuzzle();
-}
+};
 
 function updateMessage(text, type = '') {
     document.getElementById('message').className = type;
@@ -2117,53 +2063,33 @@ function showTimeoutAnimation() {
     }
 }
 
-// Function to fetch puzzles with a fallback to custom puzzles
+// Function to fetch puzzles with fallback
 function fetchPuzzlesWithFallback() {
-    // Clear all pieces from the board first
-    clearAllPieces();
-
-    fetch('./puzzles/offline/puzzles.csv')
-        .then(response => {
-            console.log("Fetch response status:", response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then(csvString => {
-            console.log("Puzzles loaded successfully");
-            puzzles = initPuzzles(csvString);
-
-            // Clear board before loading puzzles
-            clearAllPieces();
-
-            // Set initial puzzle
-            if (puzzles['param'] == null) {
-                // Don't autoload random puzzle here as we're loading a specific puzzle
-                // in the DOMContentLoaded event
-                console.log("Puzzles ready for loading");
-            } else {
-                loadPuzzle(puzzles['param']);
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching puzzles:", error);
-            console.log("Using fallback puzzles");
-
-            // Use fallback puzzles from customPuzzles already defined
-            console.log("Fallback puzzles ready for loading");
-
-            // Display a brief message about using fallback puzzles
-            const noJsElement = document.getElementById('no-js');
-            if (noJsElement) {
-                noJsElement.style.display = 'block';
-                noJsElement.innerHTML = `<strong>Using built-in puzzles</strong>`;
-                // Hide the message after 3 seconds
-                setTimeout(() => {
-                    noJsElement.style.display = 'none';
-                }, 3000);
-            }
+    console.log("Fetching puzzles with fallback");
+    try {
+        // Use our custom puzzles directly
+        puzzles = {};
+        customPuzzles.forEach((puzzle, index) => {
+            puzzles[index + 1] = puzzle;
         });
+
+        console.log("Loaded custom puzzles successfully");
+
+        // Initialize the board with the first puzzle
+        if (customPuzzles.length > 0) {
+            const firstPuzzle = customPuzzles[0];
+            currentPuzzle = firstPuzzle;
+            currentFEN = firstPuzzle.fen;
+            game = new Game(firstPuzzle.fen);
+            currentStatus = game.exportJson();
+            loadBoard(currentFEN);
+            console.log("Initialized board with first puzzle");
+        }
+    } catch (error) {
+        console.error("Error loading puzzles:", error);
+        // If there's an error, show a message to the user
+        updateMessage('<p>Error loading puzzles. Please refresh the page.</p>', 'bad');
+    }
 }
 
 const squareClicked = (square) => {
@@ -2319,30 +2245,11 @@ function loadSpecificPuzzle(index) {
             window.wrongMoveCount = {};
         }
 
-        // Special cases for puzzles 7-10
-        if (index === 7) {
-            console.log("Loading puzzle 7 with special setup");
-            setupPuzzle7();
-            return;
-        } else if (index === 8) {
-            console.log("Loading puzzle 8 with special setup");
-            setupPuzzle8();
-            return;
-        } else if (index === 9) {
-            console.log("Loading puzzle 9 with special setup");
-            setupPuzzle9();
-            return;
-        } else if (index === 10) {
-            console.log("Loading puzzle 10 with special setup");
-            setupPuzzle10();
-            return;
-        }
-
         // Reset the puzzle state
         puzzle_solved = false;
         lastPuzzleMoveIndex = 0;
 
-        // For puzzles 1-6, use standard loading
+        // Validate index
         if (index < 1 || index > customPuzzles.length) {
             console.error(`Invalid puzzle index: ${index}`);
             updateMessage('<p>Invalid puzzle index</p>', 'bad');
@@ -2401,22 +2308,7 @@ function loadSpecificPuzzle(index) {
 
     } catch (error) {
         console.error(`Error loading puzzle ${index}:`, error);
-        // Basic recovery - try to load a default puzzle
-        try {
-            updateMessage(`<p>Error loading puzzle ${index}. Loading default puzzle.</p>`, 'bad');
-            loadRandomPuzzle();
-
-            // Restore color state of all puzzle buttons
-            puzzleButtons.forEach((button, i) => {
-                if (buttonColorStates[i].backgroundColor) {
-                    button.style.backgroundColor = buttonColorStates[i].backgroundColor;
-                    button.style.color = buttonColorStates[i].color;
-                }
-            });
-        } catch (recoveryError) {
-            console.error("Recovery failed:", recoveryError);
-            updateMessage("<p>Failed to load any puzzle. Please refresh the page.</p>", 'bad');
-        }
+        updateMessage(`<p>Error loading puzzle ${index}. Please try again.</p>`, 'bad');
     }
 }
 
@@ -2479,7 +2371,7 @@ function highlightCurrentPuzzleButton(index) {
         "Puzzle 5: Multi-Variation Mate in Two",
         "Puzzle 6: Mate in Two (Black)",
         "Puzzle 7: Knight Dance to Checkmate",
-        "Puzzle 8: Rook Maneuver to Checkmate",
+        "Puzzle 8: Mate in Two with Multiple Lines",
         "Puzzle 9: Brilliant Checkmate Sequence",
         "Puzzle 10: Force Checkmate (Black)"
     ];
